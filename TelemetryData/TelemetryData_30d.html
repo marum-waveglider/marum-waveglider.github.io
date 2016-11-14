@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- <link href="../styles/style.css" rel="stylesheet" type="text/css"> -->
+<title>MARUM WaveGlider -- Power</title>
+<style> /* set the CSS */
+
+    body { font: 12px Arial;}
+
+    path { 
+        stroke: steelblue;
+        stroke-width: 2;
+        fill: none;
+    }
+    
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: grey;
+        stroke-width: 1;
+        shape-rendering: crispEdges;
+    }
+    
+    .grid .tick {
+        stroke: lightgrey;
+        stroke-opacity: 0.7;
+        shape-rendering: crispEdges;
+    }
+    .grid path {
+              stroke-width: 0;
+    }
+
+
+</style>
+
+    <div id="area1"></div>
+    <div id="area2"></div>
+    <div id="area3"></div>
+    <div id="area4"></div>
+    <div id="area5"></div>
+    <div id="area6"></div>
+    <div id="area7"></div>
+    <div id="area8"></div>
+    <div id="area9"></div>
+    <div id="area10"></div>
+    <div id="area11"></div>
+    <div id="area12"></div>
+
+
+
+<html>
+    </body>
+        <select  onChange="window.location.href=this.value" style="position: absolute; top: 20px; left: 400px;">
+              <option disabled selected value> -- select data -- </option>
+              <option value="../index.html">Startpage</option>
+              <option value="../overview.html">Overview</option>
+              <option value="../TelemetryData/TelemetryData_03h.html">Nav - Last 3h</option>
+              <option value="../TelemetryData/TelemetryData_06h.html">Nav - Last 6h</option>
+              <option value="../TelemetryData/TelemetryData_24h.html">Nav - Last 24h</option>
+              <option value="../TelemetryData/TelemetryData_07d.html">Nav - Last 7 days</option>
+              <option value="../PowerData/PowerData_03h.html">Power - Last 3h</option>
+              <option value="../PowerData/PowerData_06h.html">Power - Last 6h</option>
+              <option value="../PowerData/PowerData_24h.html">Power - Last 24h</option>
+              <option value="../PowerData/PowerData_07d.html">Power - Last 7 days</option>
+              <option value="../PowerData/PowerData_30d.html">Power - Last 30 days</option>
+              <option value="../WeatherData/WeatherData_03h.html">Weather - Last 3h</option>
+              <option value="../WeatherData/WeatherData_06h.html">Weather - Last 6h</option>
+              <option value="../WeatherData/WeatherData_24h.html">Weather - Last 24h</option>
+              <option value="../WeatherData/WeatherData_07d.html">Weather - Last 7 days</option>
+              <option value="../WeatherData/WeatherData_30d.html">Weather - Last 30 days</option>
+        </select>
+</body>
+</html>
+
+
+
+
+
+<FORM>
+<INPUT TYPE="button" onClick="history.go(0)" VALUE="Refresh">
+</FORM>
+<META HTTP-EQUIV="refresh" CONTENT="60">  
+
+<body>
+
+    <!-- load the d3.js library -->    
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+
+
+
+    <script type="text/javascript">
+        <!--
+         
+         var viewportwidth;
+         var viewportheight;
+          
+         // the more standards compliant browsers (mozilla/netscape/opera/IE7) use window.innerWidth and window.innerHeight
+          
+         if (typeof window.innerWidth != 'undefined')
+         {
+              viewportwidth = window.innerWidth,
+              viewportheight = window.innerHeight
+         }
+          
+        // IE6 in standards compliant mode (i.e. with a valid doctype as the first line in the document)
+         
+         else if (typeof document.documentElement != 'undefined'
+             && typeof document.documentElement.clientWidth !=
+             'undefined' && document.documentElement.clientWidth != 0)
+         {
+               viewportwidth = document.documentElement.clientWidth,
+               viewportheight = document.documentElement.clientHeight
+         }
+          
+         // older versions of IE
+          
+         else
+         {
+               viewportwidth = document.getElementsByTagName('body')[0].clientWidth,
+               viewportheight = document.getElementsByTagName('body')[0].clientHeight
+         }
+        // document.write('<p>Your viewport width is '+viewportwidth+'x'+viewportheight+'</p>');
+        //-->
+    </script>
+
+
+    <script>
+
+
+        var svg1 = d3.select("#area1")   
+            .append("h1").html("MARUM WaveGlider Data Hub")
+
+        var svg2 = d3.select("#area2")   
+            .append("h2").html("Nav Data -- Last 30 days")
+
+
+
+        // Set the dimensions of the canvas / graph
+        var margin    = {top: 50, right: 100, bottom: 150, left: 100},
+            width     = viewportwidth - margin.left - margin.right,
+            height    = 400 - margin.top - margin.bottom;
+
+        // Parse the date / time
+        var parseDate  = d3.time.format("%d.%m.%Y %I:%M %p").parse;
+        // var formatTime = d3.time.format("%e %B");
+
+        // Set the ranges
+        var x      = d3.time.scale().range([0, width]);
+        var y      = d3.scale.linear().range([height, 0]);
+        var y_right = d3.scale.linear().range([height, 0]);
+
+        // Define the axes
+        var xAxis = d3.svg.axis().scale(x)
+            .orient("bottom").ticks(5);
+
+        var yAxis = d3.svg.axis().scale(y)
+            .orient("left").ticks(5);
+
+        var yAxisRight = d3.svg.axis().scale(y_right)   // new declaration for 'Right', 'y\
+            .orient("right").ticks(5);             // and includes orientation .
+                
+
+        var var_time = "TimeStamp";
+
+
+        var div = d3.select("body").append("div")   
+            .attr("class", "tooltip")               
+            .style("opacity", 0);
+            
+        function make_x_axis() {        
+            return d3.svg.axis()
+                .scale(x)
+                .orient("bottom")
+                .ticks(5)
+        }
+
+        function make_y_axis() {        
+            return d3.svg.axis()
+                .scale(y)
+                .orient("left")
+                .ticks(5)
+        }
+
+
+
+    //
+    // ##########  GROUND SPEED DATA  ##########
+    //
+
+        var var_groundSpeed = "Ground Speed(kt)";
+
+        // Define the line
+        var valueline_groundSpeed = d3.svg.line()
+            .x(function(d) { return x(d[var_time]); })
+            .y(function(d) { return y(d[var_groundSpeed]); }); 
+
+        // Adds the svg canvas
+        var svg_groundSpeed = d3.select("#area3")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+            data.forEach(function(d) {
+                d[var_time] = parseDate(d[var_time]);
+                d[var_groundSpeed] = +d[var_groundSpeed];
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
+            y.domain([d3.min(data, function(d) { return d[var_groundSpeed]; }), d3.max(data, function(d) { return d[var_groundSpeed]; })]);
+
+            // Add the valueline_groundSpeed path.
+            svg_groundSpeed.append("path")
+                .attr("class", "line")
+                .attr("d", valueline_groundSpeed(data));
+
+            // Add the scatterplot
+            svg_groundSpeed.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 3.5)
+                .attr("cx", function(d) { return x(d[var_time]); })
+                .attr("cy", function(d) { return y(d[var_groundSpeed]); });
+
+            // Add Heading
+            svg_groundSpeed.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 20 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("Ground Speed");
+
+            // Add the X Axis
+            var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(10)
+                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
+
+            svg_groundSpeed.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-65)");  
+
+            svg_groundSpeed.append("text")             // text label for the x axis
+                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+
+            // Add the Y Axis
+            svg_groundSpeed.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg_groundSpeed.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 20 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Ground Speed [kts]");
+
+            svg_groundSpeed.append("g")         
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_axis()
+                    .tickSize(-height, 0, 0)
+                    .tickFormat("")
+                )
+
+            svg_groundSpeed.append("g")         
+                .attr("class", "grid")
+                .call(make_y_axis()
+                    .tickSize(-width, 0, 0)
+                    .tickFormat("")
+                )
+            .tickFormat("")                                                 // **********
+
+        });
+
+
+
+
+
+
+    //
+    // ##########  TARGET DATA  ##########
+    //
+
+        var var_Target = "Target";
+
+        // Define the line
+        var valueline_Target = d3.svg.line()
+            .x(function(d) { return x(d[var_time]); })
+            .y(function(d) { return y(d[var_Target]); }); 
+
+        // Adds the svg canvas
+        var svg_Target = d3.select("#area4")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+            data.forEach(function(d) {
+                d[var_time] = parseDate(d[var_time]);
+                d[var_Target] = +d[var_Target];
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
+            y.domain([d3.min(data, function(d) { return d[var_Target]; }), d3.max(data, function(d) { return d[var_Target]; })]);
+
+            // Add the valueline_Target path.
+            svg_Target.append("path")
+                .attr("class", "line")
+                .attr("d", valueline_Target(data));
+
+            // Add the scatterplot
+            svg_Target.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 3.5)
+                .attr("cx", function(d) { return x(d[var_time]); })
+                .attr("cy", function(d) { return y(d[var_Target]); });
+
+            // Add Heading
+            svg_Target.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 20 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("Target");
+
+            // Add the X Axis
+            var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(10)
+                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
+
+            svg_Target.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-65)");  
+
+            svg_Target.append("text")             // text label for the x axis
+                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+
+            // Add the Y Axis
+            svg_Target.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg_Target.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 20 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Target [-]");
+
+            svg_Target.append("g")         
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_axis()
+                    .tickSize(-height, 0, 0)
+                    .tickFormat("")
+                )
+
+            svg_Target.append("g")         
+                .attr("class", "grid")
+                .call(make_y_axis()
+                    .tickSize(-width, 0, 0)
+                    .tickFormat("")
+                )
+            .tickFormat("")                                                 // **********
+
+        });
+
+
+
+
+
+
+    //
+    // ##########  DESIRED HEADING DATA  ##########
+    //
+
+        var var_desHeading = "Desired Heading (deg)";
+
+        // Define the line
+        var valueline_desHeading = d3.svg.line()
+            .x(function(d) { return x(d[var_time]); })
+            .y(function(d) { return y(d[var_desHeading]); }); 
+
+        // Adds the svg canvas
+        var svg_desHeading = d3.select("#area5")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+            data.forEach(function(d) {
+                d[var_time] = parseDate(d[var_time]);
+                d[var_desHeading] = +d[var_desHeading];
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
+            y.domain([d3.min(data, function(d) { return d[var_desHeading]; }), d3.max(data, function(d) { return d[var_desHeading]; })]);
+
+            // Add the valueline_desHeading path.
+            svg_desHeading.append("path")
+                .attr("class", "line")
+                .attr("d", valueline_desHeading(data));
+
+            // Add the scatterplot
+            svg_desHeading.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 3.5)
+                .attr("cx", function(d) { return x(d[var_time]); })
+                .attr("cy", function(d) { return y(d[var_desHeading]); });
+
+            // Add Heading
+            svg_desHeading.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 20 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("Desired Heading");
+
+            // Add the X Axis
+            var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(10)
+                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
+
+            svg_desHeading.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-65)");  
+
+            svg_desHeading.append("text")             // text label for the x axis
+                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+
+            // Add the Y Axis
+            svg_desHeading.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg_desHeading.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 20 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Desired Heading [deg]");
+
+            svg_desHeading.append("g")         
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_axis()
+                    .tickSize(-height, 0, 0)
+                    .tickFormat("")
+                )
+
+            svg_desHeading.append("g")         
+                .attr("class", "grid")
+                .call(make_y_axis()
+                    .tickSize(-width, 0, 0)
+                    .tickFormat("")
+                )
+            .tickFormat("")                                                 // **********
+
+        });
+
+
+
+
+
+
+    //
+    // ##########  SUB HEADING DATA  ##########
+    //
+
+        var var_subHeading = "Sub Heading";
+
+        // Define the line
+        var valueline_subHeading = d3.svg.line()
+            .x(function(d) { return x(d[var_time]); })
+            .y(function(d) { return y(d[var_subHeading]); }); 
+
+        // Adds the svg canvas
+        var svg_subHeading = d3.select("#area6")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+            data.forEach(function(d) {
+                d[var_time] = parseDate(d[var_time]);
+                d[var_subHeading] = +d[var_subHeading];
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
+            y.domain([d3.min(data, function(d) { return d[var_subHeading]; }), d3.max(data, function(d) { return d[var_subHeading]; })]);
+
+            // Add the valueline_subHeading path.
+            svg_subHeading.append("path")
+                .attr("class", "line")
+                .attr("d", valueline_subHeading(data));
+
+            // Add the scatterplot
+            svg_subHeading.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 3.5)
+                .attr("cx", function(d) { return x(d[var_time]); })
+                .attr("cy", function(d) { return y(d[var_subHeading]); });
+
+            // Add Heading
+            svg_subHeading.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 20 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("Sub Heading");
+
+            // Add the X Axis
+            var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(10)
+                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
+
+            svg_subHeading.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-65)");  
+
+            svg_subHeading.append("text")             // text label for the x axis
+                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+
+            // Add the Y Axis
+            svg_subHeading.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg_subHeading.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 20 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Sub Heading [deg]");
+
+            svg_subHeading.append("g")         
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_axis()
+                    .tickSize(-height, 0, 0)
+                    .tickFormat("")
+                )
+
+            svg_subHeading.append("g")         
+                .attr("class", "grid")
+                .call(make_y_axis()
+                    .tickSize(-width, 0, 0)
+                    .tickFormat("")
+                )
+            .tickFormat("")                                                 // **********
+
+        });
+
+
+
+
+
+
+
+    //
+    // ##########  PATH OVER GROUND DATA  ##########
+    //
+
+        var var_POG = "POG (deg)";
+
+        // Define the line
+        var valueline_POG = d3.svg.line()
+            .x(function(d) { return x(d[var_time]); })
+            .y(function(d) { return y(d[var_POG]); }); 
+
+        // Adds the svg canvas
+        var svg_POG = d3.select("#area7")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+            data.forEach(function(d) {
+                d[var_time] = parseDate(d[var_time]);
+                d[var_POG] = +d[var_POG];
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
+            y.domain([d3.min(data, function(d) { return d[var_POG]; }), d3.max(data, function(d) { return d[var_POG]; })]);
+
+            // Add the valueline_POG path.
+            svg_POG.append("path")
+                .attr("class", "line")
+                .attr("d", valueline_POG(data));
+
+            // Add the scatterplot
+            svg_POG.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 3.5)
+                .attr("cx", function(d) { return x(d[var_time]); })
+                .attr("cy", function(d) { return y(d[var_POG]); });
+
+            // Add Heading
+            svg_POG.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 20 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("Path Over Ground");
+
+            // Add the X Axis
+            var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(10)
+                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
+
+            svg_POG.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-65)");  
+
+            svg_POG.append("text")             // text label for the x axis
+                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+
+            // Add the Y Axis
+            svg_POG.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg_POG.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 20 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Path Over Ground [deg]");
+
+            svg_POG.append("g")         
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_axis()
+                    .tickSize(-height, 0, 0)
+                    .tickFormat("")
+                )
+
+            svg_POG.append("g")         
+                .attr("class", "grid")
+                .call(make_y_axis()
+                    .tickSize(-width, 0, 0)
+                    .tickFormat("")
+                )
+            .tickFormat("")                                                 // **********
+
+        });
+
+
+
+
+
+
+    //
+    // ##########  DISTANCE OVER GROUND DATA  ##########
+    //
+
+        var var_DOG = "Distance Over Ground(m)";
+
+        // Define the line
+        var valueline_DOG = d3.svg.line()
+            .x(function(d) { return x(d[var_time]); })
+            .y(function(d) { return y(d[var_DOG]); }); 
+
+        // Adds the svg canvas
+        var svg_DOG = d3.select("#area8")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+            data.forEach(function(d) {
+                d[var_time] = parseDate(d[var_time]);
+                d[var_DOG] = +d[var_DOG];
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
+            y.domain([d3.min(data, function(d) { return d[var_DOG]; }), d3.max(data, function(d) { return d[var_DOG]; })]);
+
+            // Add the valueline_DOG path.
+            svg_DOG.append("path")
+                .attr("class", "line")
+                .attr("d", valueline_DOG(data));
+
+            // Add the scatterplot
+            svg_DOG.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 3.5)
+                .attr("cx", function(d) { return x(d[var_time]); })
+                .attr("cy", function(d) { return y(d[var_DOG]); });
+
+            // Add Heading
+            svg_DOG.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 20 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("Distance Over Ground");
+
+            // Add the X Axis
+            var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(10)
+                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
+
+            svg_DOG.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-65)");  
+
+            svg_DOG.append("text")             // text label for the x axis
+                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+
+            // Add the Y Axis
+            svg_DOG.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg_DOG.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 20 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Distance Over Ground [m]");
+
+            svg_DOG.append("g")         
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_axis()
+                    .tickSize(-height, 0, 0)
+                    .tickFormat("")
+                )
+
+            svg_DOG.append("g")         
+                .attr("class", "grid")
+                .call(make_y_axis()
+                    .tickSize(-width, 0, 0)
+                    .tickFormat("")
+                )
+            .tickFormat("")                                                 // **********
+
+        });
+
+
+
+
+
+
+    //
+    // ##########  WATER SPEED DATA  ##########
+    //
+
+        var var_WaterSpeed = "Water Speed (kt/1000) WS";
+
+        // Define the line
+        var valueline_WaterSpeed = d3.svg.line()
+            .x(function(d) { return x(d[var_time]); })
+            .y(function(d) { return y(d[var_WaterSpeed]); }); 
+
+        // Adds the svg canvas
+        var svg_WaterSpeed = d3.select("#area9")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+            data.forEach(function(d) {
+                d[var_time] = parseDate(d[var_time]);
+                d[var_WaterSpeed] = +d[var_WaterSpeed];
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
+            y.domain([d3.min(data, function(d) { return d[var_WaterSpeed]; }), d3.max(data, function(d) { return d[var_WaterSpeed]; })]);
+
+            // Add the valueline_WaterSpeed path.
+            svg_WaterSpeed.append("path")
+                .attr("class", "line")
+                .attr("d", valueline_WaterSpeed(data));
+
+            // Add the scatterplot
+            svg_WaterSpeed.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 3.5)
+                .attr("cx", function(d) { return x(d[var_time]); })
+                .attr("cy", function(d) { return y(d[var_WaterSpeed]); });
+
+            // Add Heading
+            svg_WaterSpeed.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 20 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("Water Speed");
+
+            // Add the X Axis
+            var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(10)
+                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
+
+            svg_WaterSpeed.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-65)");  
+
+            svg_WaterSpeed.append("text")             // text label for the x axis
+                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+
+            // Add the Y Axis
+            svg_WaterSpeed.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg_WaterSpeed.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 20 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Water Speed [kts/1000]");
+
+            svg_WaterSpeed.append("g")         
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_axis()
+                    .tickSize(-height, 0, 0)
+                    .tickFormat("")
+                )
+
+            svg_WaterSpeed.append("g")         
+                .attr("class", "grid")
+                .call(make_y_axis()
+                    .tickSize(-width, 0, 0)
+                    .tickFormat("")
+                )
+            .tickFormat("")                                                 // **********
+
+        });
+
+
+
+
+
+    //
+    // ##########  WATER DIRECTION DATA  ##########
+    //
+
+        var var_WaterDir = "Water Direction";
+
+        // Define the line
+        var valueline_WaterDir = d3.svg.line()
+            .x(function(d) { return x(d[var_time]); })
+            .y(function(d) { return y(d[var_WaterDir]); }); 
+
+        // Adds the svg canvas
+        var svg_WaterDir = d3.select("#area10")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+            data.forEach(function(d) {
+                d[var_time] = parseDate(d[var_time]);
+                d[var_WaterDir] = +d[var_WaterDir];
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
+            y.domain([d3.min(data, function(d) { return d[var_WaterDir]; }), d3.max(data, function(d) { return d[var_WaterDir]; })]);
+
+            // Add the valueline_WaterDir path.
+            svg_WaterDir.append("path")
+                .attr("class", "line")
+                .attr("d", valueline_WaterDir(data));
+
+            // Add the scatterplot
+            svg_WaterDir.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 3.5)
+                .attr("cx", function(d) { return x(d[var_time]); })
+                .attr("cy", function(d) { return y(d[var_WaterDir]); });
+
+            // Add Heading
+            svg_WaterDir.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 20 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("Water Direction");
+
+            // Add the X Axis
+            var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(10)
+                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
+
+            svg_WaterDir.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-65)");  
+
+            svg_WaterDir.append("text")             // text label for the x axis
+                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+
+            // Add the Y Axis
+            svg_WaterDir.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg_WaterDir.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 20 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Water Direction [deg]");
+
+            svg_WaterDir.append("g")         
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_axis()
+                    .tickSize(-height, 0, 0)
+                    .tickFormat("")
+                )
+
+            svg_WaterDir.append("g")         
+                .attr("class", "grid")
+                .call(make_y_axis()
+                    .tickSize(-width, 0, 0)
+                    .tickFormat("")
+                )
+            .tickFormat("")                                                 // **********
+
+        });
+
+
+
+
+
+    //
+    // ##########  CURRENT SPEED DATA  ##########
+    //
+
+        var var_CurrentSpeed = "Current Speed (kt)";
+
+        // Define the line
+        var valueline_CurrentSpeed = d3.svg.line()
+            .x(function(d) { return x(d[var_time]); })
+            .y(function(d) { return y(d[var_CurrentSpeed]); }); 
+
+        // Adds the svg canvas
+        var svg_CurrentSpeed = d3.select("#area11")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+            data.forEach(function(d) {
+                d[var_time] = parseDate(d[var_time]);
+                d[var_CurrentSpeed] = +d[var_CurrentSpeed];
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
+            y.domain([d3.min(data, function(d) { return d[var_CurrentSpeed]; }), d3.max(data, function(d) { return d[var_CurrentSpeed]; })]);
+
+            // Add the valueline_CurrentSpeed path.
+            svg_CurrentSpeed.append("path")
+                .attr("class", "line")
+                .attr("d", valueline_CurrentSpeed(data));
+
+            // Add the scatterplot
+            svg_CurrentSpeed.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 3.5)
+                .attr("cx", function(d) { return x(d[var_time]); })
+                .attr("cy", function(d) { return y(d[var_CurrentSpeed]); });
+
+            // Add Heading
+            svg_CurrentSpeed.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 20 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("Current Speed");
+
+            // Add the X Axis
+            var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(10)
+                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
+
+            svg_CurrentSpeed.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-65)");  
+
+            svg_CurrentSpeed.append("text")             // text label for the x axis
+                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+
+            // Add the Y Axis
+            svg_CurrentSpeed.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg_CurrentSpeed.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 20 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Current Speed [kts]");
+
+            svg_CurrentSpeed.append("g")         
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_axis()
+                    .tickSize(-height, 0, 0)
+                    .tickFormat("")
+                )
+
+            svg_CurrentSpeed.append("g")         
+                .attr("class", "grid")
+                .call(make_y_axis()
+                    .tickSize(-width, 0, 0)
+                    .tickFormat("")
+                )
+            .tickFormat("")                                                 // **********
+
+        });
+
+
+
+
+
+
+    //
+    // ##########  CURRENT HEADING DATA  ##########
+    //
+
+        var var_CurrentHeading = "Current Heading (deg)";
+
+        // Define the line
+        var valueline_CurrentHeading = d3.svg.line()
+            .x(function(d) { return x(d[var_time]); })
+            .y(function(d) { return y(d[var_CurrentHeading]); }); 
+
+        // Adds the svg canvas
+        var svg_CurrentHeading = d3.select("#area12")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+            data.forEach(function(d) {
+                d[var_time] = parseDate(d[var_time]);
+                d[var_CurrentHeading] = +d[var_CurrentHeading];
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
+            y.domain([d3.min(data, function(d) { return d[var_CurrentHeading]; }), d3.max(data, function(d) { return d[var_CurrentHeading]; })]);
+
+            // Add the valueline_CurrentHeading path.
+            svg_CurrentHeading.append("path")
+                .attr("class", "line")
+                .attr("d", valueline_CurrentHeading(data));
+
+            // Add the scatterplot
+            svg_CurrentHeading.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 3.5)
+                .attr("cx", function(d) { return x(d[var_time]); })
+                .attr("cy", function(d) { return y(d[var_CurrentHeading]); });
+
+            // Add Heading
+            svg_CurrentHeading.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 20 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("Current Heading");
+
+            // Add the X Axis
+            var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(10)
+                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
+
+            svg_CurrentHeading.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-65)");  
+
+            svg_CurrentHeading.append("text")             // text label for the x axis
+                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+
+            // Add the Y Axis
+            svg_CurrentHeading.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg_CurrentHeading.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 20 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Current Heading [deg]");
+
+            svg_CurrentHeading.append("g")         
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_axis()
+                    .tickSize(-height, 0, 0)
+                    .tickFormat("")
+                )
+
+            svg_CurrentHeading.append("g")         
+                .attr("class", "grid")
+                .call(make_y_axis()
+                    .tickSize(-width, 0, 0)
+                    .tickFormat("")
+                )
+            .tickFormat("")                                                 // **********
+
+        });
+
+
+
+
+
+    </script>
+</body>
