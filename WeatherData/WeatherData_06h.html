@@ -48,26 +48,23 @@
 
 <html>
     </body>
-        <select  onChange="window.location.href=this.value" style="position: absolute; top: 20px; left: 400px;">
+        <select  onChange="window.location.href=this.value" style="position: absolute; top: 90px; left: 5px;">
               <option disabled selected value> -- select data -- </option>
               <option value="../index.html">Startpage</option>
               <option value="../overview.html">Overview</option>
-              <option value="../TelemetryData/TelemetryData_03h.html">Nav - Last 3h</option>
-              <option value="../TelemetryData/TelemetryData_06h.html">Nav - Last 6h</option>
-              <option value="../TelemetryData/TelemetryData_24h.html">Nav - Last 24h</option>
-              <option value="../TelemetryData/TelemetryData_07d.html">Nav - Last 7 days</option>
-              <option value="../TelemetryData/TelemetryData_30d.html">Nav - Last 30 days</option>
-              <option value="../PowerData/PowerData_03h.html">Power - Last 3h</option>
-              <option value="../PowerData/PowerData_06h.html">Power - Last 6h</option>
-              <option value="../PowerData/PowerData_24h.html">Power - Last 24h</option>
-              <option value="../PowerData/PowerData_07d.html">Power - Last 7 days</option>
-              <option value="../PowerData/PowerData_30d.html">Power - Last 30 days</option>
-              <option value="../WeatherData/WeatherData_03h.html">Weather - Last 3h</option>
-              <option value="../WeatherData/WeatherData_24h.html">Weather - Last 24h</option>
-              <option value="../WeatherData/WeatherData_07d.html">Weather - Last 7 days</option>
-              <option value="../WeatherData/WeatherData_30d.html">Weather - Last 30 days</option>
+              <option value="../TelemetryData/TelemetryData_07d.html">Navigation</option>
+              <option value="../PowerData/PowerData_07d.html">Power</option>
         </select>
-</body>
+    </body>
+    <body>
+        <select  onChange="window.location.href=this.value" style="position: absolute; top: 90px; left: 150px;">
+              <option disabled selected value> -- select range -- </option>
+              <option value="../WeatherData/WeatherData_03h.html">Last 3h</option>
+              <option value="../WeatherData/WeatherData_24h.html">Last 24h</option>
+              <option value="../WeatherData/WeatherData_07d.html">Last 7 days</option>
+              <option value="../WeatherData/WeatherData_30d.html">Last 30 days</option>
+        </select>
+    </body>
 </html>
 
 
@@ -81,7 +78,8 @@
 <body>
 
     <!-- load the d3.js library -->    
-    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+    <script src="../D3/d3.v3.min.js"></script>
 
 
 
@@ -127,7 +125,7 @@
             .append("h1").html("MARUM WaveGlider Data Hub")
 
         var svg2 = d3.select("#area2")   
-            .append("h2").html("Weather Data -- Last 6h")
+            .append("h2").html("Weather Data - Last 6h")
 
 
         // Set the dimensions of the canvas / graph
