@@ -85,7 +85,6 @@
               <option disabled selected value> -- select range -- </option>
               <option value="../TelemetryData/TelemetryData_03h.html">Last 3h</option>
               <option value="../TelemetryData/TelemetryData_30d.html">Last 30 days</option>
-              <option value="../TelemetryData/TelemetryData_all.html">All</option>
         </select>
     </body>
 </html>
@@ -293,7 +292,7 @@
         .y(function(d) { return y_target(d[var_target]); });
 
 
-    var svg_target = d3.select("#area5").append("svg")
+    var svg_target = d3.select("#area6").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -375,7 +374,7 @@
         .y(function(d) { return y_desHead(d[var_desHeading]); });
 
 
-    var svg_desHead = d3.select("#area6").append("svg")
+    var svg_desHead = d3.select("#area5").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
