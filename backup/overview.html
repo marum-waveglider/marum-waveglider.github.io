@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+<link href="styles/style.css" rel="stylesheet" type="text/css">
+<title>MARUM WaveGlider Data Hub</title>
+<style>
+* {
+  padding: 0;
+  margin: 0;
+}
+.fit {
+  max-width: 95%;
+  max-height: 95%;
+}
+.center {
+  display: block;
+  margin: auto;
+}
+</style>
+</head>
+<body>
+<img align=center src="https://www.marum.de/img/marum_logo_en.png">
+<body>
+<h1>MARUM WaveGlider Data Hub </h1>
+<h2>NOT AVAILABLE AT THE MOMENT</h2> 
+
+
+
+
+
+<html>
+    </body>
+        <select  onChange="window.location.href=this.value" style="position: absolute; top: 400px; left: 140px;">
+              <option disabled selected value> -- select data -- </option>
+              <option value="index.html">Startpage</option>
+              <option value="TelemetryData/TelemetryData_07d.html">Navigation</option>
+              <option value="PowerData/PowerData_07d.html">Power</option>
+              <option value="WeatherData/WeatherData_07d.html">Weather</option>
+        </select>
+    </body>
+</html>
+
+
+<body>
+
+    <!-- load the d3.js library -->    
+    <!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+    <script src="../D3/d3.v3.min.js"></script>
+
+
+    <script>
+        
+        var texts = svg.selectAll("text")
+                        .data(dataset)
+                        .enter();
+
+        texts.append("text")
+             .text(function(d){
+                            return d.metric;})
+             // set position etc.
+
+        texts.append("text")
+             .text(function(d){
+                            return d.value;})
+             // set position etc.
+
+    </script>                   
+</body>
