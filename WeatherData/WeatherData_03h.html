@@ -4,7 +4,13 @@
 <title>MARUM WaveGlider -- Weather</title>
 <style> /* set the CSS */
 
-    body { font: 12px Arial;}
+   body { 
+        font: 12px sans-serif;
+    }
+
+    svg {
+      font: 10px sans-serif;
+    }    
 
     path { 
         stroke: steelblue;
@@ -129,7 +135,7 @@
             .append("h2").html("Weather Data - Last 3 hours" )
         
         var svg3 = d3.select("#area3")   
-            .append("p").html("Auto Refresh ON -- Last refresh: " + time_now )
+            .append("p").html("Zoom OFF -- Auto Refresh ON -- Last refresh: " + time_now )
 
 
 

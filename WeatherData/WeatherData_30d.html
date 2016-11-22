@@ -1,87 +1,104 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<!-- <link href="../styles/style.css" rel="stylesheet" type="text/css"> -->
-<title>MARUM WaveGlider -- Weather</title>
-<style> /* set the CSS */
-
-    body { font: 12px Arial;}
-
-    path { 
-        stroke: steelblue;
-        stroke-width: 2;
-        fill: none;
-    }
-    
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: grey;
-        stroke-width: 1;
-        shape-rendering: crispEdges;
-    }
-    
-    .grid .tick {
-        stroke: lightgrey;
-        stroke-opacity: 0.7;
-        shape-rendering: crispEdges;
-    }
-    .grid path {
-              stroke-width: 0;
+<title>MARUM WaveGlider - Weather</title>
+<style>
+    body { 
+        font: 12px sans-serif;
     }
 
+    svg {
+      font: 10px sans-serif;
+    }
 
+    .axis {
+      shape-rendering: crispEdges;
+    }
+
+    .axis path, .axis line {
+      fill: none;
+      stroke-width: .5px;
+    }
+
+    .x.axis path {
+      stroke: #000;
+    }
+
+    .x.axis line {
+      stroke: #fff;
+      stroke-opacity: .5;
+    }
+
+    .y.axis line {
+      stroke: #ddd;
+    }
+
+    path.line {
+      fill: none;
+      stroke: #000;
+      stroke-width: .5px;
+    }
+
+    rect.pane {
+      cursor: move;
+      fill: none;
+      pointer-events: all;
+    }
+
+
+. tooltip {
+  position: absolute;
+  width: 200px;
+  height: 28px;
+  pointer-events: none;
+}
 </style>
 
 
-
-    <div id="area1"></div>
-    <div id="area2"></div>
-    <div id="area3"></div>
-    <div id="area4"></div>
-    <div id="area5"></div>
-    <div id="area6"></div>
-    <div id="area7"></div>
-
-
+<div id="area1"></div>
+<div id="area2"></div>
+<div id="area3"></div>
+<div id="area4"></div>
+<div id="area5"></div>
+<div id="area6"></div>
+<div id="area7"></div>
+<div id="area8"></div>
+<div id="area9"></div>
+<div id="area10"></div>
+<div id="area11"></div>
+<div id="area12"></div>
+<div id="area13"></div>
 
 
 
 <html>
     </body>
-        <select  onChange="window.location.href=this.value" style="position: absolute; top: 90px; left: 5px;">
+        <select  onChange="window.location.href=this.value" style="position: absolute; top: 120px; left: 5px;">
               <option disabled selected value> -- select data -- </option>
               <option value="../index.html">Startpage</option>
               <option value="../overview.html">Overview</option>
+              <option value="../PowerData/PowerData_30d.html">Power</option>
               <option value="../TelemetryData/TelemetryData_30d.html">Navigation</option>
-              <option value="../PowerData/PowerData_07d.html">Power</option>
         </select>
     </body>
     <body>
-        <select  onChange="window.location.href=this.value" style="position: absolute; top: 90px; left: 150px;">
+        <select  onChange="window.location.href=this.value" style="position: absolute; top: 120px; left: 150px;">
               <option disabled selected value> -- select range -- </option>
               <option value="../WeatherData/WeatherData_03h.html">Last 3h</option>
               <option value="../WeatherData/WeatherData_06h.html">Last 6h</option>
-              <option value="../WeatherData/WeatherData_24h.html">Last 24h</option>
-              <option value="../WeatherData/WeatherData_07d.html">Last 7 days</option>
         </select>
     </body>
 </html>
 
 
+
+
+
 <FORM>
 <INPUT TYPE="button" onClick="history.go(0)" VALUE="Refresh">
 </FORM>
-<META HTTP-EQUIV="refresh" CONTENT="60">  
 
 <body>
-
-    <!-- load the d3.js library -->    
-    <!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
-    <script src="../D3/d3.v3.min.js"></script>
-
-
-
-    <script type="text/javascript">
+   <script type="text/javascript">
         <!--
          
          var viewportwidth;
@@ -116,584 +133,561 @@
         //-->
     </script>
 
-
-    <script>
-
-        var svg1 = d3.select("#area1")   
-            .append("h1").html("MARUM WaveGlider Data Hub")
-
-        var svg2 = d3.select("#area2")   
-            .append("h2").html("Weather Data - Last 30 days")
-
-
-        // Set the dimensions of the canvas / graph
-        var margin    = {top: 50, right: 150, bottom: 150, left: 100},
-            width     = viewportwidth - margin.left - margin.right,
-            height    = 400 - margin.top - margin.bottom;
-
-        // Parse the date / time
-        var parseDate  = d3.time.format("%d.%m.%Y %I:%M %p").parse;
-        // var formatTime = d3.time.format("%e %B");
-
-        // Set the ranges
-        var x      = d3.time.scale().range([0, width]);
-        var y      = d3.scale.linear().range([height, 0]);
-        var y_right = d3.scale.linear().range([height, 0]);
-
-        // Define the axes
-        var xAxis = d3.svg.axis().scale(x)
-            .orient("bottom").ticks(5);
-
-        var yAxis = d3.svg.axis().scale(y)
-            .orient("left").ticks(5);
-
-        var yAxisRight = d3.svg.axis().scale(y_right)   // new declaration for 'Right', 'y\
-            .orient("right").ticks(5);             // and includes orientation .
-                
-
-
-
+<!-- <script src="//d3js.org/d3.v3.min.js"></script> -->
+<script src="../D3/d3.v3.min.js"></script>
+<script>
     
+    // Get time 
+    time_now = new Date();
 
-    //
-    // ##########  WIND SPEED DATA  ##########
-    //
+    var svg1 = d3.select("#area1")   
+        .append("h1").html("MARUM WaveGlider Data Hub")
 
-        var var_wind = "Wind Speed(kt)";
-
-        // Define the line
-        var valueline_wind = d3.svg.line()
-            .x(function(d) { return x(d[var_time]); })
-            .y(function(d) { return y(d[var_wind]); }); 
-
-
-        var var_gust = "Wind Gust Speed(kt)";
-        // Define the line
-        var valueline_gust = d3.svg.line()
-            .x(function(d) { return x(d[var_time]); })
-            .y(function(d) { return y_right(d[var_gust]); }); 
-
-
-        // Adds the svg canvas
-        var svg_wind = d3.select("#area3")
-            .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-                .attr("transform", 
-                      "translate(" + margin.left + "," + margin.top + ")");
-
-
-        d3.csv("WeatherData_wgms_30d.csv", function(error, data) {
-            data.forEach(function(d) {
-                d[var_time] = parseDate(d[var_time]);
-                d[var_wind] = +d[var_wind];
-                d[var_gust] = +d[var_gust];
-            });
-
-            // Scale the range of the data
-            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
-            y.domain([d3.min(data, function(d) { return Math.min(d[var_wind], d[var_gust]); }), d3.max(data, function(d) { return Math.max(d[var_wind], d[var_gust]); })]);
-            y_right.domain([d3.min(data, function(d) { return Math.min(d[var_wind], d[var_gust]); }), d3.max(data, function(d) { return Math.max(d[var_wind], d[var_gust]); })]);
-
-            // Add the valueline_wind path.
-            svg_wind.append("path")
-                .attr("class", "line")
-                .attr("d", valueline_wind(data));
-
-            // Add the valueline_gust path.
-            svg_wind.append("path")
-                .attr("class", "line")
-                .attr("d", valueline_gust(data));
-            svg_wind.append("path")        // Add the valueline2 path.
-                .style("stroke", "red")
-                .attr("d", valueline_gust(data));
-
-
-
-            // Add the scatterplot
-            svg_wind.selectAll("dot")
-                .data(data)
-                .enter().append("circle")
-                .attr("r", 2)
-                .attr("cx", function(d) { return x(d[var_time]); })
-                .attr("cy", function(d) { return y(d[var_wind]); });
-
-
-             // Add the scatterplot
-            svg_wind.selectAll("dot")
-                .data(data)
-                .enter().append("circle")
-                .attr("r", 3.5)
-                .attr("cx", function(d) { return x(d[var_time]); })
-                .attr("cy", function(d) { return y(d[var_gust]); });
+    var svg2 = d3.select("#area2")   
+        .append("h2").html("Weather Data - Last 30 days" )
     
-
-            // Add Heading
-            svg_wind.append("text")
-                .attr("x", (width / 2))             
-                .attr("y", 20 - (margin.top / 2))
-                .attr("text-anchor", "middle")  
-                .style("font-size", "16px") 
-                .style("text-decoration", "underline")  
-                .text("Wind Speed");
+    var svg3 = d3.select("#area3")   
+        .append("p").html("Zoom ON -- Auto Refresh OFF -- Last refresh: " + time_now )
 
 
-            // Add the X Axis
-            var xAxis = d3.svg.axis().scale(x)
-                .orient("bottom").ticks(10)
-                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
-            
-            svg_wind.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(xAxis)
-                .selectAll("text")  
-                    .style("text-anchor", "end")
-                    .attr("dx", "-.8em")
-                    .attr("dy", ".15em")
-                    .attr("transform", "rotate(-65)");  
+    // Setup margins
+    var margin    = {top: 50, right: 100, bottom: 150, left: 100},
+        width     = viewportwidth - margin.left - margin.right,
+        height    = 400 - margin.top - margin.bottom;
+        h_sta     = 400 - margin.top - margin.bottom;
+        parse     = d3.time.format("%d.%m.%Y %I:%M %p").parse,
+        format    = d3.time.format("%Y");
 
-            svg_wind.append("text")             // text label for the x axis
-                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
-                .style("text-anchor", "middle")
-                .text("Time");
+    // add the tooltip area to the webpage
+    var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
 
-            // Add the Y Axis
-            svg_wind.append("g")
-                .attr("class", "y axis")
-                .call(yAxis);
-
-            svg_wind.append("g")             
-                .attr("class", "y axis")    
-                .attr("transform", "translate(" + width + " ,0)")   
-                .style("fill", "red")       
-                .call(yAxisRight);  
 
 
-            svg_wind.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 20 - margin.left)
-                .attr("x", 0 - (height / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .text("Wind Speed [kts]");
+    // ================
+    // Wind Speed (kt)
+    //
 
-            svg_wind.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", viewportwidth-260 + margin.left)
-                .attr("x", 0 - (height / 2))
-                .attr("dy", "1em") 
-                .style("text-anchor", "middle", "fill", "red")  //TODO: make red
-                .text("Wind Gust Speed [kts]");
+    var var_wind = "Wind Speed(kt)";
 
-            svg_wind.append("g")         
-                .attr("class", "grid")
-                .attr("transform", "translate(0," + height + ")")
-                .call(make_x_axis()
-                    .tickSize(-height, 0, 0)
-                    .tickFormat("")
-                )
+    var x = d3.time.scale()
+            .range([0, width]),
+        y = d3.scale.linear()
+            .range([height, 0]),
+        xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickSize(-height, 0)
+            .tickPadding(6)
+            .tickFormat(d3.time.format("%Y-%m-%d %H:%M")),
+        yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .tickSize(-width)
+            .tickPadding(6);
 
-            svg_wind.append("g")         
-                .attr("class", "grid")
-                .call(make_y_axis()
-                    .tickSize(-width, 0, 0)
-                    .tickFormat("")
-                )
-            .tickFormat("")                                            
 
-       
+    var line = d3.svg.line()
+        .interpolate("step-after")
+        .x(function(d) { return x(d.TimeStamp); })
+        .y(function(d) { return y(d[var_wind]); });
 
+
+    var svg = d3.select("#area4").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+    svg.append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("x", x(0))
+        .attr("y", y(1))
+        .attr("width", x(1) - x(0))
+        .attr("height", y(0) - y(1));
+
+    svg.append("g")
+        .attr("class", "y axis")
+        // .attr("transform", "translate(" + width + ",0)");
+
+    svg.append("path")
+        .attr("class", "area")
+        .attr("clip-path", "url(#clip)")
+        .style("fill", "url(#gradient)");
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")");
+
+    svg.append("path")
+        .attr("class", "line")
+        .attr("clip-path", "url(#clip_sta)")
+        .style("fill", "none")
+        .style("stroke", "#900")
+        .style("stroke-width", "2");
+    
+    svg.append("rect")
+        .attr("class", "pane")
+        .attr("width", width)
+        .attr("height", height)
+        .call(d3.behavior.zoom().on("zoom", zoom));
+
+    var rect = svg.append("rect")
+        .attr("class", "pane")
+        .attr("width", width)
+        .attr("height", height);
+
+    svg.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 20 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Wind Speed (Zoom HERE)");
+
+     svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 20 - margin.left)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Wind Speed [kts]");
+
+      svg.append("text")             // text label for the x axis
+        .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-120) + ")")
+        .style("text-anchor", "middle")
+        .text("Time (GMT-8)");
+
+// ============
+// Wind Gust Speed(kt)
+//
+
+    var var_windGust = "Wind Gust Speed(kt)";
+
+    // Setup scales for stations graph
+    var y_windGust = d3.scale.linear()
+            .range([h_sta, 0]),
+        xAxis_windGust = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickSize(-h_sta, 0)
+            .tickPadding(6)
+            .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
+        yAxis_windGust = d3.svg.axis()
+            .scale(y_windGust)
+            .orient("left")
+            .tickSize(-width)
+            .tickPadding(6);
+
+
+    var line_windGust = d3.svg.line()
+        .interpolate("step-after")
+        .x(function(d) { return x(d.TimeStamp); })
+        .y(function(d) { return y_windGust(d[var_windGust]); });
+
+
+    var svg_windGust = d3.select("#area6").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg_windGust.append("clipPath")
+        .attr("id", "clip_sta")
+      .append("rect")
+        .attr("x", x(0))
+        .attr("y", y(1))
+        .attr("width", x(1) - x(0))
+        .attr("height", y(0) - y(1));
+
+    svg_windGust.append("g")
+        .attr("class", "y axis")
+        // .attr("transform", "translate(" + width + ",0)");
+
+    svg_windGust.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + h_sta + ")");
+
+    svg_windGust.append("path")
+        .attr("class", "line_windGust")
+        .attr("clip-path", "url(#clip_sta)")
+        .style("fill", "none")
+        .style("stroke", "#900")
+        .style("stroke-width", "2");
+
+    svg_windGust.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 20 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Wind Gust Speed");
+
+
+    svg_windGust.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 20 - margin.left)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Wind Gust Speed [kts]");
+
+    svg_windGust.append("text")             // text label for the x axis
+        .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-120) + ")")
+        .style("text-anchor", "middle")
+        .text("Time (GMT-8)");
+
+
+
+
+
+// ============
+// Wind Direction
+//
+    var var_windDir = "Wind Direction";
+
+    // Setup scales for stations graph
+    var y_windDir = d3.scale.linear()
+            .range([h_sta, 0]),
+        xAxis_windDir = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickSize(-h_sta, 0)
+            .tickPadding(6)
+            .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
+        yAxis_windDir = d3.svg.axis()
+            .scale(y_windDir)
+            .orient("left")
+            .tickSize(-width)
+            .tickPadding(6);
+
+
+    var line_windDir = d3.svg.line()
+        .interpolate("step-after")
+        .x(function(d) { return x(d.TimeStamp); })
+        .y(function(d) { return y_windDir(d[var_windDir]); });
+
+
+    var svg_windDir = d3.select("#area5").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg_windDir.append("clipPath")
+        .attr("id", "clip_desHead")
+      .append("rect")
+        .attr("x", x(0))
+        .attr("y", y(1))
+        .attr("width", x(1) - x(0))
+        .attr("height", y(0) - y(1));
+
+    svg_windDir.append("g")
+        .attr("class", "y axis")
+        // .attr("transform", "translate(" + width + ",0)");
+
+    svg_windDir.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + h_sta + ")");
+
+    svg_windDir.append("path")
+        .attr("class", "line_windDir")
+        .attr("clip-path", "url(#clip_desHead)")
+        .style("fill", "none")
+        .style("stroke", "#900")
+        .style("stroke-width", "2");
+
+    svg_windDir.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 20 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Wind Direction");
+
+
+    svg_windDir.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 20 - margin.left)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Wind Direction [deg]");
+
+
+    svg_windDir.append("text")             // text label for the x axis
+        .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-120) + ")")
+        .style("text-anchor", "middle")
+        .text("Time (GMT-8)");
+
+
+
+
+// ============
+// Temperature(degC)
+//
+    var var_temp = "Temperature(degC)";
+
+    // Setup scales for stations graph
+    var y_temp = d3.scale.linear()
+            .range([h_sta, 0]),
+        xAxis_temp = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickSize(-h_sta, 0)
+            .tickPadding(6)
+            .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
+        yAxis_temp = d3.svg.axis()
+            .scale(y_temp)
+            .orient("left")
+            .tickSize(-width)
+            .tickPadding(6);
+
+
+    var line_temp = d3.svg.line()
+        .interpolate("step-after")
+        .x(function(d) { return x(d.TimeStamp); })
+        .y(function(d) { return y_temp(d[var_temp]); });
+
+
+    var svg_temp = d3.select("#area7").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg_temp.append("clipPath")
+        .attr("id", "clip_sta")
+      .append("rect")
+        .attr("x", x(0))
+        .attr("y", y(1))
+        .attr("width", x(1) - x(0))
+        .attr("height", y(0) - y(1));
+
+    svg_temp.append("g")
+        .attr("class", "y axis")
+        // .attr("transform", "translate(" + width + ",0)");
+
+    svg_temp.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + h_sta + ")");
+
+    svg_temp.append("path")
+        .attr("class", "line_temp")
+        .attr("clip-path", "url(#clip_sta)")
+        .style("fill", "none")
+        .style("stroke", "#900")
+        .style("stroke-width", "2");
+
+    svg_temp.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 20 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Temperature");
+
+
+    svg_temp.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 20 - margin.left)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Temperature [deg C]");
+
+
+    svg_temp.append("text")             // text label for the x axis
+        .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-120) + ")")
+        .style("text-anchor", "middle")
+        .text("Time (GMT-8)");
+
+
+
+
+
+
+// ============
+// Pressure(mb)
+//
+    var var_pressure = "Pressure(mb)";
+
+    // Setup scales for stations graph
+    var y_pressure = d3.scale.linear()
+            .range([h_sta, 0]),
+        xAxis_pressure = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickSize(-h_sta, 0)
+            .tickPadding(6)
+            .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
+        yAxis_pressure = d3.svg.axis()
+            .scale(y_pressure)
+            .orient("left")
+            .tickSize(-width)
+            .tickPadding(6);
+
+
+    var line_pressure = d3.svg.line()
+        .interpolate("step-after")
+        .x(function(d) { return x(d.TimeStamp); })
+        .y(function(d) { return y_pressure(d[var_pressure]); });
+
+
+    var svg_pressure = d3.select("#area8").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg_pressure.append("clipPath")
+        .attr("id", "clip_sta")
+      .append("rect")
+        .attr("x", x(0))
+        .attr("y", y(1))
+        .attr("width", x(1) - x(0))
+        .attr("height", y(0) - y(1));
+
+    svg_pressure.append("g")
+        .attr("class", "y axis")
+        // .attr("transform", "translate(" + width + ",0)");
+
+    svg_pressure.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + h_sta + ")");
+
+    svg_pressure.append("path")
+        .attr("class", "line_pressure")
+        .attr("clip-path", "url(#clip_sta)")
+        .style("fill", "none")
+        .style("stroke", "#900")
+        .style("stroke-width", "2");
+
+    svg_pressure.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 20 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Pressure");
+
+
+    svg_pressure.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 20 - margin.left)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Pressure [mBar]");
+
+
+    svg_pressure.append("text")             // text label for the x axis
+        .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-120) + ")")
+        .style("text-anchor", "middle")
+        .text("Time (GMT-8)");
+
+
+
+
+
+
+    // ============
+    // CREATE PLOTS
+    //
+
+    d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+      if (error) throw error;
+    
+        data.forEach(function(d) {
+            d.TimeStamp = parse(d.TimeStamp);
+            d[var_wind]    = +d[var_wind];
+            d[var_windGust]         = +d[var_windGust];
+            d[var_windDir]     = +d[var_windDir];
+            d[var_temp]        = +d[var_temp];
+            d[var_pressure]            = +d[var_pressure];
+            d[var_DOG]            = +d[var_DOG];
+            d[var_waterSpeed]     = +d[var_waterSpeed];
+            d[var_waterDir]       = +d[var_waterDir];
+            d[var_currV]          = +d[var_currV];
+            d[var_currDir]        = +d[var_currDir];
         });
 
 
-
-
-    //
-    // ##########  WIND DIRECTION DATA  ##########
-    //
-
-        var var_windDir = "Wind Direction";
-        // Define the line
-        var valueline_windDir = d3.svg.line()
-            .x(function(d) { return x(d[var_time]); })
-            .y(function(d) { return y(d[var_windDir]); }); 
-
-        // Adds the svg canvas
-        var svg_windDir = d3.select("#area4")
-            .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-                .attr("transform", 
-                      "translate(" + margin.left + "," + margin.top + ")");
-
-
-        d3.csv("WeatherData_wgms_30d.csv", function(error, data) {
-            data.forEach(function(d) {
-                d[var_time] = parseDate(d[var_time]);
-                d[var_windDir] = +d[var_windDir];
-            });
-
-            // Scale the range of the data
-            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
-            y.domain([d3.min(data, function(d) { return d[var_windDir]; }), d3.max(data, function(d) { return d[var_windDir]; })]);
-
-            // Add the valueline_windDir path.
-            svg_windDir.append("path")
-                .attr("class", "line")
-                .attr("d", valueline_windDir(data));
-
-            // Add the scatterplot
-            svg_windDir.selectAll("dot")
-                .data(data)
-                .enter().append("circle")
-                .attr("r", 3.5)
-                .attr("cx", function(d) { return x(d[var_time]); })
-                .attr("cy", function(d) { return y(d[var_windDir]); });
-
-
-            // Add Heading
-            svg_windDir.append("text")
-                .attr("x", (width / 2))             
-                .attr("y", 20 - (margin.top / 2))
-                .attr("text-anchor", "middle")  
-                .style("font-size", "16px") 
-                .style("text-decoration", "underline")  
-                .text("Wind Direction");
-
-            // Add the X Axis
-            var xAxis = d3.svg.axis().scale(x)
-                .orient("bottom").ticks(10)
-                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
-
-            svg_windDir.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(xAxis)
-                .selectAll("text")  
-                    .style("text-anchor", "end")
-                    .attr("dx", "-.8em")
-                    .attr("dy", ".15em")
-                    .attr("transform", "rotate(-65)");  
-
-            svg_windDir.append("text")             // text label for the x axis
-                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
-                .style("text-anchor", "middle")
-                .text("Time");
-
-
-            // Add the Y Axis
-            svg_windDir.append("g")
-                .attr("class", "y axis")
-                .call(yAxis);
-
-            svg_windDir.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 20 - margin.left)
-                .attr("x", 0 - (height / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .text("Wind Direction [deg]");
-
-            svg_windDir.append("g")         
-                .attr("class", "grid")
-                .attr("transform", "translate(0," + height + ")")
-                .call(make_x_axis()
-                    .tickSize(-height, 0, 0)
-                    .tickFormat("")
-                )
-
-            svg_windDir.append("g")         
-                .attr("class", "grid")
-                .call(make_y_axis()
-                    .tickSize(-width, 0, 0)
-                    .tickFormat("")
-                )
-            .tickFormat("")                                                 // **********
-
-        });
-
-
-
-    //
-    // ##########  TEMP DATA  ##########
-    //
-
-        var var_time = "TimeStamp";
-        var var_temp = "Temperature(degC)";
-
-        // Define the line
-        var valueline = d3.svg.line()
-            .x(function(d) { return x(d[var_time]); })
-            .y(function(d) { return y(d[var_temp]); }); 
-
-        var div = d3.select("body").append("div")   
-            .attr("class", "tooltip")               
-            .style("opacity", 0);
-            
-        // Adds the svg canvas
-        var svg_temp = d3.select("#area5")
-            .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-                .attr("transform", 
-                      "translate(" + margin.left + "," + margin.top + ")");
-
-        function make_x_axis() {        
-            return d3.svg.axis()
-                .scale(x)
-                .orient("bottom")
-                .ticks(5)
-        }
-
-        function make_y_axis() {        
-            return d3.svg.axis()
-                .scale(y)
-                .orient("left")
-                .ticks(5)
-        }
-
-
-        // Get the data
-        d3.csv("WeatherData_wgms_30d.csv", function(error, data) {
-            data.forEach(function(d) {
-                d[var_time] = parseDate(d[var_time]);
-                d[var_temp] = +d[var_temp];
-            });
-
-            // Scale the range of the data
-            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
-            y.domain([d3.min(data, function(d) { return d[var_temp]; }), d3.max(data, function(d) { return d[var_temp]; })]);
-
-            // Add the valueline path.
-            svg_temp.append("path")
-                .attr("class", "line")
-                .attr("d", valueline(data));
-
-            // Add the scatterplot
-            svg_temp.selectAll("dot")
-                .data(data)
-                .enter().append("circle")
-                .attr("r", 3.5)
-                .attr("cx", function(d) { return x(d[var_time]); })
-                .attr("cy", function(d) { return y(d[var_temp]); });    
-
-            // Add Heading
-            svg_temp.append("text")
-                .attr("x", (width / 2))             
-                .attr("y", 20 - (margin.top / 2))
-                .attr("text-anchor", "middle")  
-                .style("font-size", "16px") 
-                .style("text-decoration", "underline")  
-                .text("Temperature");
-
-
-            // Add the X Axis
-            var xAxis = d3.svg.axis().scale(x)
-                .orient("bottom").ticks(10)
-                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function 
-
-            svg_temp.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(xAxis)
-                .selectAll("text")  
-                    .style("text-anchor", "end")
-                    .attr("dx", "-.8em")
-                    .attr("dy", ".15em")
-                    .attr("transform", "rotate(-65)");  
-
-            svg_temp.append("text")             // text label for the x axis
-                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
-                .style("text-anchor", "middle")
-                .text("Time");
-
-
-            // Add the Y Axis
-            svg_temp.append("g")
-                .attr("class", "y axis")
-                .call(yAxis);
-
-            svg_temp.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 20 - margin.left)
-                .attr("x", 0 - (height / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .text("Temperature [deg C]");
-
-
-            svg_temp.append("g")         
-                .attr("class", "grid")
-                .attr("transform", "translate(0," + height + ")")
-                .call(make_x_axis()
-                    .tickSize(-height, 0, 0)
-                    .tickFormat("")
-                )
-
-            svg_temp.append("g")         
-                .attr("class", "grid")
-                .call(make_y_axis()
-                    .tickSize(-width, 0, 0)
-                    .tickFormat("")
-                )
-            .tickFormat("")                                                 // **********
-
-        });
-
-
-
-
-
-
-
-
-    //
-    // ##########  PRESSURE DATA  ##########
-    //
-
-        var var_pressure = "Pressure(mb)";
-        // Define the line
-        var valueline_pressure = d3.svg.line()
-            .x(function(d) { return x(d[var_time]); })
-            .y(function(d) { return y(d[var_pressure]); }); 
-
-        // Adds the svg canvas
-        var svg_pressure = d3.select("#area6")
-            .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-                .attr("transform", 
-                      "translate(" + margin.left + "," + margin.top + ")");
-
-
-        d3.csv("WeatherData_wgms_30d.csv", function(error, data) {
-            data.forEach(function(d) {
-                d[var_time] = parseDate(d[var_time]);
-                d[var_pressure] = +d[var_pressure];
-            });
-
-            // Scale the range of the data
-            x.domain(d3.extent(data, function(d) { return d[var_time]; }));
-            y.domain([d3.min(data, function(d) { return d[var_pressure]; }), d3.max(data, function(d) { return d[var_pressure]; })]);
-
-            // Add the valueline_pressure path.
-            svg_pressure.append("path")
-                .attr("class", "line")
-                .attr("d", valueline_pressure(data));
-
-            // Add the scatterplot
-            svg_pressure.selectAll("dot")
-                .data(data)
-                .enter().append("circle")
-                .attr("r", 3.5)
-                .attr("cx", function(d) { return x(d[var_time]); })
-                .attr("cy", function(d) { return y(d[var_pressure]); });
-
-
-            // Add Heading
-            svg_pressure.append("text")
-                .attr("x", (width / 2))             
-                .attr("y", 20 - (margin.top / 2))
-                .attr("text-anchor", "middle")  
-                .style("font-size", "16px") 
-                .style("text-decoration", "underline")  
-                .text("Pressure");
-
-            // Add the X Axis
-            var xAxis = d3.svg.axis().scale(x)
-                .orient("bottom").ticks(10)
-                .tickFormat(d3.time.format("%Y-%m-%d %H:%M")); // insert the tickFormat function
-            
-            svg_pressure.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(xAxis)
-                .selectAll("text")  
-                    .style("text-anchor", "end")
-                    .attr("dx", "-.8em")
-                    .attr("dy", ".15em")
-                    .attr("transform", "rotate(-65)");  
-
-            svg_pressure.append("text")             // text label for the x axis
-                .attr("transform","translate("+ (width/2) + " ," +(height+margin.bottom-35) + ")")
-                .style("text-anchor", "middle")
-                .text("Time");
-
-
-            // Add the Y Axis
-            svg_pressure.append("g")
-                .attr("class", "y axis")
-                .call(yAxis);
-
-            svg_pressure.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 20 - margin.left)
-                .attr("x", 0 - (height / 2))
-                .attr("dy", "0.5em")
-                .style("text-anchor", "middle")
-                .text("Pressure [mBar]");
-
-            svg_pressure.append("g")         
-                .attr("class", "grid")
-                .attr("transform", "translate(0," + height + ")")
-                .call(make_x_axis()
-                    .tickSize(-height, 0, 0)
-                    .tickFormat("")
-                )
-
-            svg_pressure.append("g")         
-                .attr("class", "grid")
-                .call(make_y_axis()
-                    .tickSize(-width, 0, 0)
-                    .tickFormat("")
-                )
-            .tickFormat("")                                                 // **********
-
-        });
-
-
-
-
-        // var inter = setInterval(function() {
-        //                 updateData();
-        //         }, 1000); 
-
-
-        // function updateData() {
-
-        //     // Get the data again
-        //     d3.csv("data-alt.csv", function(error, data) {
-        //         data.forEach(function(d) {
-        //             d.date = parseDate(d.date);
-        //             d.close = +d.close;
-        //         });
-
-        //         // Scale the range of the data again 
-        //         x.domain(d3.extent(data, function(d) { return d.date; }));
-        //             y.domain([0, d3.max(data, function(d) { return d.close; })]);
-
-        //         // Select the section we want to apply our changes to
-        //         var svg = d3.select("body").transition();
-
-        //         // Make the changes
-        //             svg.select(".line")   // change the line
-        //                 .duration(750)
-        //                 .attr("d", valueline(data));
-        //             svg.select(".x.axis") // change the x axis
-        //                 .duration(750)
-        //                 .call(xAxis);
-        //             svg.select(".y.axis") // change the y axis
-        //                 .duration(750)
-        //                 .call(yAxis);
-
-        //     });
-        // }
-
-    </script>
-</body>
+        // Compute the minimum and maximum value for both graphs
+        x.domain([
+            d3.min(data, function(d) { return d.TimeStamp; }),
+            d3.max(data, function(d) { return d.TimeStamp; })
+        ]);
+        
+        y.domain([
+            d3.min(data, function(d) { return d[var_wind]; }), 
+            d3.max(data, function(d) { return d[var_wind]; })
+        ]);
+
+        y_windGust.domain([
+            d3.min(data, function(d) { return d[var_windGust]; }), 
+            d3.max(data, function(d) { return d[var_windGust]; })
+        ]);
+
+        y_windDir.domain([
+            d3.min(data, function(d) { return d[var_windDir]; }), 
+            d3.max(data, function(d) { return d[var_windDir]; })
+        ]);
+
+        y_temp.domain([
+            d3.min(data, function(d) { return d[var_temp]; }), 
+            d3.max(data, function(d) { return d[var_temp]; })
+        ]);
+
+        y_pressure.domain([
+            d3.min(data, function(d) { return d[var_pressure]; }), 
+            d3.max(data, function(d) { return d[var_pressure]; })
+        ]);
+
+        // Add zoom behavior
+        rect.call(d3.behavior.zoom().x(x).on("zoom", zoom));
+        
+        svg.select("path.line").data([data]);
+        svg_windGust.select("path.line_windGust").data([data]);
+        svg_windDir.select("path.line_windDir").data([data]);
+        svg_temp.select("path.line_temp").data([data]);
+        svg_pressure.select("path.line_pressure").data([data]);
+
+        draw();
+    });
+
+
+
+    function draw() {
+      // Draw axes
+      svg.select("g.x.axis").call(xAxis);
+      svg.select("g.y.axis").call(yAxis);
+      svg_windGust.select("g.x.axis").call(xAxis_windGust);
+      svg_windGust.select("g.y.axis").call(yAxis_windGust);
+      svg_windDir.select("g.x.axis").call(xAxis_windDir);
+      svg_windDir.select("g.y.axis").call(yAxis_windDir);
+      svg_temp.select("g.x.axis").call(xAxis_temp);
+      svg_temp.select("g.y.axis").call(yAxis_temp);
+      svg_pressure.select("g.x.axis").call(xAxis_pressure);
+      svg_pressure.select("g.y.axis").call(yAxis_pressure);
+
+
+      // Add data
+      svg.select("path.line").attr("d", line);
+      svg_windGust.select("path.line_windGust").attr("d", line_windGust);
+      svg_windDir.select("path.line_windDir").attr("d", line_windDir);
+      svg_temp.select("path.line_temp").attr("d", line_temp);
+      svg_pressure.select("path.line_pressure").attr("d", line_pressure);
+    }
+
+    function zoom() {
+      draw();
+    }
+
+
+
+</script>
