@@ -10,7 +10,7 @@
         stroke: steelblue;
         stroke-width: 2;
         fill: none;
-    }
+    } 
     
     .axis path,
     .axis line {
@@ -42,22 +42,21 @@
 
 
 
+
 <html>
     </body>
-        <select  onChange="window.location.href=this.value" style="position: absolute; top: 90px; left: 5px;">
+        <select  onChange="window.location.href=this.value" style="position: absolute; top: 120px; left: 5px;">
               <option disabled selected value> -- select data -- </option>
               <option value="../index.html">Startpage</option>
               <option value="../overview.html">Overview</option>
               <option value="../TelemetryData/TelemetryData_30d.html">Navigation</option>
-              <option value="../WeatherData/WeatherData_07d.html">Weather</option>
+              <option value="../WeatherData/WeatherData_30d.html">Weather</option>
         </select>
     </body>
     <body>
-        <select  onChange="window.location.href=this.value" style="position: absolute; top: 90px; left: 150px;">
+        <select  onChange="window.location.href=this.value" style="position: absolute; top: 120px; left: 150px;">
               <option disabled selected value> -- select range -- </option>
               <option value="../PowerData/PowerData_03h.html">Last 3h</option>
-              <option value="../PowerData/PowerData_24h.html">Last 24h</option>
-              <option value="../PowerData/PowerData_07d.html">Last 7 days</option>
               <option value="../PowerData/PowerData_30d.html">Last 30 days</option>
         </select>
     </body>
@@ -119,11 +118,18 @@
     <script>
 
 
+        // Get time 
+        time_now = new Date();
+
         var svg1 = d3.select("#area1")   
             .append("h1").html("MARUM WaveGlider Data Hub")
 
         var svg2 = d3.select("#area2")   
-            .append("h2").html("Power Data - Last 6h")
+            .append("h2").html("Power Data - Last 6 hours" )
+        
+        var svg3 = d3.select("#area3")   
+            .append("p").html("Auto Refresh ON -- Last refresh: " + time_now )
+
 
 
 
@@ -187,7 +193,7 @@
             .y(function(d) { return y(d[var_totBattPower]); }); 
 
         // Adds the svg canvas
-        var svg_totBattPower = d3.select("#area3")
+        var svg_totBattPower = d3.select("#area4")
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -215,7 +221,7 @@
             svg_totBattPower.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_totBattPower]); });
 
@@ -246,7 +252,7 @@
             svg_totBattPower.append("text")             // text label for the x axis
                 .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
                 .style("text-anchor", "middle")
-                .text("Time");
+                .text("Time (GMT-8)");
 
 
             // Add the Y Axis
@@ -296,7 +302,7 @@
             .y(function(d) { return y(d[var_solarPower]); }); 
 
         // Adds the svg canvas
-        var svg_solarPower = d3.select("#area4")
+        var svg_solarPower = d3.select("#area5")
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -324,7 +330,7 @@
             svg_solarPower.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_solarPower]); });
 
@@ -355,7 +361,7 @@
             svg_solarPower.append("text")             // text label for the x axis
                 .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
                 .style("text-anchor", "middle")
-                .text("Time");
+                .text("Time (GMT-8)");
 
 
             // Add the Y Axis
@@ -406,7 +412,7 @@
             .y(function(d) { return y(d[var_outputPower]); }); 
 
         // Adds the svg canvas
-        var svg_outputPower = d3.select("#area4")
+        var svg_outputPower = d3.select("#area6")
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -434,7 +440,7 @@
             svg_outputPower.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_outputPower]); });
 
@@ -465,7 +471,7 @@
             svg_outputPower.append("text")             // text label for the x axis
                 .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
                 .style("text-anchor", "middle")
-                .text("Time");
+                .text("Time (GMT-8)");
 
 
             // Add the Y Axis
@@ -516,7 +522,7 @@
             .y(function(d) { return y(d[var_battCharge]); }); 
 
         // Adds the svg canvas
-        var svg_battCharge = d3.select("#area4")
+        var svg_battCharge = d3.select("#area7")
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -544,7 +550,7 @@
             svg_battCharge.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_battCharge]); });
 
@@ -575,7 +581,7 @@
             svg_battCharge.append("text")             // text label for the x axis
                 .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
                 .style("text-anchor", "middle")
-                .text("Time");
+                .text("Time (GMT-8)");
 
 
             // Add the Y Axis
@@ -625,7 +631,7 @@
             .y(function(d) { return y(d[var_battCharge_I]); }); 
 
         // Adds the svg canvas
-        var svg_battCharge_I = d3.select("#area4")
+        var svg_battCharge_I = d3.select("#area8")
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -653,7 +659,7 @@
             svg_battCharge_I.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_battCharge_I]); });
 
@@ -684,7 +690,7 @@
             svg_battCharge_I.append("text")             // text label for the x axis
                 .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
                 .style("text-anchor", "middle")
-                .text("Time");
+                .text("Time (GMT-8)");
 
 
             // Add the Y Axis

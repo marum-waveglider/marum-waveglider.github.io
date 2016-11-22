@@ -70,7 +70,6 @@
 <FORM>
 <INPUT TYPE="button" onClick="history.go(0)" VALUE="Refresh">
 </FORM>
-<META HTTP-EQUIV="refresh" CONTENT="60">  
 
 <body>
 
@@ -215,7 +214,7 @@
             svg_totBattPower.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_totBattPower]); });
 

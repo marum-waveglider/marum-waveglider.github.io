@@ -47,24 +47,25 @@
 
 <html>
     </body>
-        <select  onChange="window.location.href=this.value" style="position: absolute; top: 90px; left: 5px;">
+        <select  onChange="window.location.href=this.value" style="position: absolute; top: 120px; left: 5px;">
               <option disabled selected value> -- select data -- </option>
               <option value="../index.html">Startpage</option>
               <option value="../overview.html">Overview</option>
               <option value="../TelemetryData/TelemetryData_30d.html">Navigation</option>
-              <option value="../PowerData/PowerData_07d.html">Power</option>
+              <option value="../PowerData/PowerData_30d.html">Power</option>
         </select>
     </body>
     <body>
-        <select  onChange="window.location.href=this.value" style="position: absolute; top: 90px; left: 150px;">
+        <select  onChange="window.location.href=this.value" style="position: absolute; top: 120px; left: 150px;">
               <option disabled selected value> -- select range -- </option>
               <option value="../WeatherData/WeatherData_06h.html">Last 6h</option>
-              <option value="../WeatherData/WeatherData_24h.html">Last 24h</option>
-              <option value="../WeatherData/WeatherData_07d.html">Last 7 days</option>
               <option value="../WeatherData/WeatherData_30d.html">Last 30 days</option>
         </select>
     </body>
 </html>
+
+
+
 
 
 <FORM>
@@ -118,11 +119,21 @@
 
     <script>
 
+     // Get time 
+        time_now = new Date();
+
         var svg1 = d3.select("#area1")   
             .append("h1").html("MARUM WaveGlider Data Hub")
 
         var svg2 = d3.select("#area2")   
-            .append("h2").html("Weather Data - Last 3h")
+            .append("h2").html("Weather Data - Last 3 hours" )
+        
+        var svg3 = d3.select("#area3")   
+            .append("p").html("Auto Refresh ON -- Last refresh: " + time_now )
+
+
+
+
 
 
         // Set the dimensions of the canvas / graph
@@ -174,7 +185,7 @@
 
 
         // Adds the svg canvas
-        var svg_wind = d3.select("#area3")
+        var svg_wind = d3.select("#area4")
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -214,7 +225,7 @@
             svg_wind.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_wind]); });
 
@@ -223,7 +234,7 @@
             svg_wind.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_gust]); });
     
@@ -256,7 +267,7 @@
             svg_wind.append("text")             // text label for the x axis
                 .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
                 .style("text-anchor", "middle")
-                .text("Time");
+                .text("Time (GMT-8)");
 
 
             // Add the Y Axis
@@ -321,7 +332,7 @@
             .y(function(d) { return y(d[var_windDir]); }); 
 
         // Adds the svg canvas
-        var svg_windDir = d3.select("#area4")
+        var svg_windDir = d3.select("#area5")
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -349,7 +360,7 @@
             svg_windDir.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_windDir]); });
 
@@ -381,7 +392,7 @@
             svg_windDir.append("text")             // text label for the x axis
                 .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
                 .style("text-anchor", "middle")
-                .text("Time");
+                .text("Time (GMT-8)");
 
 
             // Add the Y Axis
@@ -434,7 +445,7 @@
             .style("opacity", 0);
             
         // Adds the svg canvas
-        var svg_temp = d3.select("#area5")
+        var svg_temp = d3.select("#area6")
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -477,7 +488,7 @@
             svg_temp.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_temp]); });    
 
@@ -509,7 +520,7 @@
             svg_temp.append("text")             // text label for the x axis
                 .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-35) + ")")
                 .style("text-anchor", "middle")
-                .text("Time");
+                .text("Time (GMT-8)");
 
 
             // Add the Y Axis
@@ -562,7 +573,7 @@
             .y(function(d) { return y(d[var_pressure]); }); 
 
         // Adds the svg canvas
-        var svg_pressure = d3.select("#area6")
+        var svg_pressure = d3.select("#area7")
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -590,7 +601,7 @@
             svg_pressure.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_pressure]); });
 
@@ -622,7 +633,7 @@
             svg_pressure.append("text")             // text label for the x axis
                 .attr("transform","translate("+ (width/2) + " ," +(height+margin.bottom-35) + ")")
                 .style("text-anchor", "middle")
-                .text("Time");
+                .text("Time (GMT-8)");
 
 
             // Add the Y Axis

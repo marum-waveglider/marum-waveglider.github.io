@@ -215,7 +215,7 @@
             svg_wind.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 3.5)
+                .attr("r", 2)
                 .attr("cx", function(d) { return x(d[var_time]); })
                 .attr("cy", function(d) { return y(d[var_wind]); });
 

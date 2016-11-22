@@ -83,8 +83,8 @@
     <body>
         <select  onChange="window.location.href=this.value" style="position: absolute; top: 120px; left: 150px;">
               <option disabled selected value> -- select range -- </option>
-              <option value="../TelemetryData/TelemetryData_03h.html">Last 3h</option>
               <option value="../TelemetryData/TelemetryData_06h.html">Last 6h</option>
+              <option value="../TelemetryData/TelemetryData_30d.html">Last 30 days</option>
         </select>
     </body>
 </html>
@@ -96,6 +96,7 @@
 <FORM>
 <INPUT TYPE="button" onClick="history.go(0)" VALUE="Refresh">
 </FORM>
+<META HTTP-EQUIV="refresh" CONTENT="60">  
 
 <body>
    <script type="text/javascript">
@@ -144,10 +145,10 @@
         .append("h1").html("MARUM WaveGlider Data Hub")
 
     var svg2 = d3.select("#area2")   
-        .append("h2").html("Navigation Data - Last 30 days" )
+        .append("h2").html("Navigation Data - Last 3 hours" )
     
     var svg3 = d3.select("#area3")   
-        .append("p").html("Zoomable -- Auto Refresh OFF -- Last refresh: " + time_now )
+        .append("p").html("Auto Refresh ON -- Last update: " + time_now )
 
 
     // Setup margins
@@ -162,6 +163,7 @@
     var tooltip = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
+
 
 
 
@@ -1006,7 +1008,7 @@
     // CREATE PLOTS
     //
 
-    d3.csv("TelemetryData_wgms_30d.csv", function(error, data) {
+    d3.csv("TelemetryData_wgms_03h.csv", function(error, data) {
       if (error) throw error;
     
         data.forEach(function(d) {
