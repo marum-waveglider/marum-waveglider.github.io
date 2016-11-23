@@ -169,7 +169,6 @@
     // ================
     // Wind Speed (kt)
     //
-
     var var_wind = "Wind Speed(kt)";
 
     var x = d3.time.scale()
@@ -180,8 +179,8 @@
             .scale(x)
             .orient("bottom")
             .tickSize(-height, 0)
-            .tickPadding(6)
-            .tickFormat(d3.time.format("%Y-%m-%d %H:%M")),
+            .tickPadding(6);
+            // .tickFormat(d3.time.format("%Y-%m-%d %H:%M")),
         yAxis = d3.svg.axis()
             .scale(y)
             .orient("left")
@@ -262,10 +261,12 @@
         .style("text-anchor", "middle")
         .text("Time (GMT-8)");
 
+
+
+
 // ============
 // Wind Gust Speed(kt)
 //
-
     var var_windGust = "Wind Gust Speed(kt)";
 
     // Setup scales for stations graph
@@ -275,8 +276,8 @@
             .scale(x)
             .orient("bottom")
             .tickSize(-h_sta, 0)
-            .tickPadding(6)
-            .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
+            .tickPadding(6);
+            // .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
         yAxis_windGust = d3.svg.axis()
             .scale(y_windGust)
             .orient("left")
@@ -345,9 +346,9 @@
 
 
 
-// ============
-// Wind Direction
-//
+    // ============
+    // Wind Direction
+    //
     var var_windDir = "Wind Direction";
 
     // Setup scales for stations graph
@@ -357,8 +358,8 @@
             .scale(x)
             .orient("bottom")
             .tickSize(-h_sta, 0)
-            .tickPadding(6)
-            .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
+            .tickPadding(6);
+            // .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
         yAxis_windDir = d3.svg.axis()
             .scale(y_windDir)
             .orient("left")
@@ -427,9 +428,9 @@
 
 
 
-// ============
-// Temperature(degC)
-//
+    // ============
+    // Temperature(degC)
+    //
     var var_temp = "Temperature(degC)";
 
     // Setup scales for stations graph
@@ -439,8 +440,8 @@
             .scale(x)
             .orient("bottom")
             .tickSize(-h_sta, 0)
-            .tickPadding(6)
-            .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
+            .tickPadding(6);
+            // .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
         yAxis_temp = d3.svg.axis()
             .scale(y_temp)
             .orient("left")
@@ -523,8 +524,8 @@
             .scale(x)
             .orient("bottom")
             .tickSize(-h_sta, 0)
-            .tickPadding(6)
-            .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
+            .tickPadding(6);
+            // .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
         yAxis_pressure = d3.svg.axis()
             .scale(y_pressure)
             .orient("left")
@@ -604,16 +605,11 @@
     
         data.forEach(function(d) {
             d.TimeStamp = parse(d.TimeStamp);
-            d[var_wind]    = +d[var_wind];
-            d[var_windGust]         = +d[var_windGust];
-            d[var_windDir]     = +d[var_windDir];
-            d[var_temp]        = +d[var_temp];
-            d[var_pressure]            = +d[var_pressure];
-            d[var_DOG]            = +d[var_DOG];
-            d[var_waterSpeed]     = +d[var_waterSpeed];
-            d[var_waterDir]       = +d[var_waterDir];
-            d[var_currV]          = +d[var_currV];
-            d[var_currDir]        = +d[var_currDir];
+            d[var_wind]         = +d[var_wind];
+            d[var_windGust]     = +d[var_windGust];
+            d[var_windDir]      = +d[var_windDir];
+            d[var_temp]         = +d[var_temp];
+            d[var_pressure]     = +d[var_pressure];
         });
 
 
@@ -687,7 +683,5 @@
     function zoom() {
       draw();
     }
-
-
 
 </script>
