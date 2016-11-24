@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<title>MARUM WaveGlider - Weather</title>
+<title>MARUM WaveGlider - Power</title>
 <style>
     body { 
         font: 12px sans-serif;
@@ -15,10 +15,10 @@
     }
 
     .axis path, .axis line {
-      fill: none;
-      stroke-width: .5px;
+        fill: none;
+        stroke-width: .5px;
     }
-
+ 
     .x.axis path {
       stroke: #000;
     }
@@ -44,13 +44,12 @@
       pointer-events: all;
     }
 
-
-. tooltip {
-  position: absolute;
-  width: 200px;
-  height: 28px;
-  pointer-events: none;
-}
+    . tooltip {
+      position: absolute;
+      width: 200px;
+      height: 28px;
+      pointer-events: none;
+    }
 </style>
 
 
@@ -73,18 +72,18 @@
 <html>
     </body>
         <select  onChange="window.location.href=this.value" style="position: absolute; top: 120px; left: 5px;">
-              <option disabled selected value>Weather</option>
+              <option disabled selected value>Power</option>
               <option value="../index.html">Startpage</option>
               <option value="../overview.html">Overview</option>
-              <option value="../PowerData/PowerData_30d.html">Power</option>
               <option value="../TelemetryData/TelemetryData_30d.html">Navigation</option>
+              <option value="../WeatherData/WeatherData_30d.html">Weather</option>
         </select>
     </body>
     <body>
         <select  onChange="window.location.href=this.value" style="position: absolute; top: 120px; left: 150px;">
               <option disabled selected value>Last 30 days</option>
-              <option value="../WeatherData/WeatherData_03h.html">Last 3h</option>
-              <option value="../WeatherData/WeatherData_06h.html">Last 6h</option>
+              <option value="../PowerData/PowerData_03h.html">Last 3h</option>
+              <option value="../PowerData/PowerData_06h.html">Last 6h</option>
         </select>
     </body>
 </html>
@@ -147,7 +146,7 @@
         .append("h1").html("MARUM WaveGlider Data Hub")
 
     var svg2 = d3.select("#area2")   
-        .append("h2").html("Weather Data - Last 30 days" )
+        .append("h2").html("Power Data - Last 30 days" )
     
     var svg3 = d3.select("#area3")   
         .append("p").html("Zoom ON -- Auto Refresh OFF -- Last refresh: " + time_now )
@@ -156,10 +155,12 @@
     // Setup margins
     var margin    = {top: 50, right: 100, bottom: 70, left: 100},
         width     = viewportwidth - margin.left - margin.right,
-        height    = 300 - margin.top - margin.bottom;
+        height    = 300 - margin.top - margin.bottom,
         h_sta     = 300 - margin.top - margin.bottom;
-        parse     = d3.time.format("%d.%m.%Y %I:%M %p").parse,
-        format    = d3.time.format("%Y");
+
+
+    var parse     = d3.time.format("%d.%m.%Y %I:%M %p").parse,
+        format    = d3.time.format("%d.%m.%Y");
 
     // add the tooltip area to the webpage
     var tooltip = d3.select("body").append("div")
@@ -170,9 +171,10 @@
 
 
     // ================
-    // Wind Speed (kt)
+    // Total Battery Power (mW/h)
     //
-    var var_wind = "Wind Speed(kt)";
+
+    var var_totBattPower = "Total Battery Power (mW/h)";
 
     var x = d3.time.scale()
             .range([0, width]),
@@ -183,7 +185,7 @@
             .orient("bottom")
             .tickSize(-height, 0)
             .tickPadding(6);
-            // .tickFormat(d3.time.format("%Y-%m-%d %H:%M")),
+            // .tickFormat(d3.time.format("%Y-%m-%d %H:%M"));
         yAxis = d3.svg.axis()
             .scale(y)
             .orient("left")
@@ -194,7 +196,7 @@
     var line = d3.svg.line()
         .interpolate("step-after")
         .x(function(d) { return x(d3.time.hour.offset(d[var_time],UTC_to_LR_time_offset)); })
-        .y(function(d) { return y(d[var_wind]); });
+        .y(function(d) { return y(d[var_totBattPower]); });
 
 
     var svg = d3.select("#area4").append("svg")
@@ -249,7 +251,7 @@
         .attr("text-anchor", "middle")  
         .style("font-size", "16px") 
         .style("text-decoration", "underline")  
-        .text("Wind Speed (Zoom HERE)");
+        .text("Total Battery Power (Zoom HERE)");
 
      svg.append("text")
         .attr("transform", "rotate(-90)")
@@ -257,50 +259,49 @@
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Wind Speed [kts]");
+        .text("GTotal Battery Power [mW/h]");
 
       svg.append("text")             // text label for the x axis
-               .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-40) + ")")
+        .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-40) + ")")
         .style("text-anchor", "middle")
         .text("UTC")
 
 
 
-
 // ============
-// Wind Gust Speed(kt)
+// Solar Power Generated (mW)
 //
-    var var_windGust = "Wind Gust Speed(kt)";
+    var var_powSolar = "Solar Power Generated (mW)";
 
     // Setup scales for stations graph
-    var y_windGust = d3.scale.linear()
+    var y_powSolar = d3.scale.linear()
             .range([h_sta, 0]),
-        xAxis_windGust = d3.svg.axis()
+        xAxis_powSolar = d3.svg.axis()
             .scale(x)
             .orient("bottom")
             .tickSize(-h_sta, 0)
             .tickPadding(6);
             // .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
-        yAxis_windGust = d3.svg.axis()
-            .scale(y_windGust)
+        yAxis_powSolar = d3.svg.axis()
+            .scale(y_powSolar)
             .orient("left")
             .tickSize(-width)
             .tickPadding(6);
 
 
-    var line_windGust = d3.svg.line()
+    var line_powSolar = d3.svg.line()
         .interpolate("step-after")
         .x(function(d) { return x(d3.time.hour.offset(d[var_time],UTC_to_LR_time_offset)); })
-        .y(function(d) { return y_windGust(d[var_windGust]); });
+        .y(function(d) { return y_powSolar(d[var_powSolar]); });
 
 
-    var svg_windGust = d3.select("#area6").append("svg")
+    var svg_powSolar = d3.select("#area6").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svg_windGust.append("clipPath")
+    svg_powSolar.append("clipPath")
         .attr("id", "clip_sta")
       .append("rect")
         .attr("x", x(0))
@@ -308,39 +309,39 @@
         .attr("width", x(1) - x(0))
         .attr("height", y(0) - y(1));
 
-    svg_windGust.append("g")
+    svg_powSolar.append("g")
         .attr("class", "y axis")
         // .attr("transform", "translate(" + width + ",0)");
 
-    svg_windGust.append("g")
+    svg_powSolar.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + h_sta + ")");
 
-    svg_windGust.append("path")
-        .attr("class", "line_windGust")
+    svg_powSolar.append("path")
+        .attr("class", "line_powSolar")
         .attr("clip-path", "url(#clip_sta)")
         .style("fill", "none")
         .style("stroke", "#900")
         .style("stroke-width", "2");
 
-    svg_windGust.append("text")
+    svg_powSolar.append("text")
         .attr("x", (width / 2))             
         .attr("y", 20 - (margin.top / 2))
         .attr("text-anchor", "middle")  
         .style("font-size", "16px") 
         .style("text-decoration", "underline")  
-        .text("Wind Gust Speed");
+        .text("Solar Power Generated");
 
 
-    svg_windGust.append("text")
+    svg_powSolar.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 20 - margin.left)
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Wind Gust Speed [kts]");
+        .text("Solar Power Generated [mW]");
 
-    svg_windGust.append("text")             // text label for the x axis
+    svg_powSolar.append("text")             // text label for the x axis
                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-40) + ")")
         .style("text-anchor", "middle")
         .text("UTC")
@@ -350,39 +351,38 @@
 
 
     // ============
-    // Wind Direction
+    // Output Port Power (mW)
     //
-    var var_windDir = "Wind Direction";
+    var var_powOut = "Output Port Power (mW)";
 
     // Setup scales for stations graph
-    var y_windDir = d3.scale.linear()
+    var y_powOut = d3.scale.linear()
             .range([h_sta, 0]),
-        xAxis_windDir = d3.svg.axis()
+        xAxis_powOut = d3.svg.axis()
             .scale(x)
             .orient("bottom")
             .tickSize(-h_sta, 0)
             .tickPadding(6);
-            // .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
-        yAxis_windDir = d3.svg.axis()
-            .scale(y_windDir)
+        yAxis_powOut = d3.svg.axis()
+            .scale(y_powOut)
             .orient("left")
             .tickSize(-width)
             .tickPadding(6);
 
 
-    var line_windDir = d3.svg.line()
+    var line_powOut = d3.svg.line()
         .interpolate("step-after")
         .x(function(d) { return x(d3.time.hour.offset(d[var_time],UTC_to_LR_time_offset)); })
-        .y(function(d) { return y_windDir(d[var_windDir]); });
+        .y(function(d) { return y_powOut(d[var_powOut]); });
 
 
-    var svg_windDir = d3.select("#area5").append("svg")
+    var svg_powOut = d3.select("#area5").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svg_windDir.append("clipPath")
+    svg_powOut.append("clipPath")
         .attr("id", "clip_desHead")
       .append("rect")
         .attr("x", x(0))
@@ -390,40 +390,40 @@
         .attr("width", x(1) - x(0))
         .attr("height", y(0) - y(1));
 
-    svg_windDir.append("g")
+    svg_powOut.append("g")
         .attr("class", "y axis")
         // .attr("transform", "translate(" + width + ",0)");
 
-    svg_windDir.append("g")
+    svg_powOut.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + h_sta + ")");
 
-    svg_windDir.append("path")
-        .attr("class", "line_windDir")
+    svg_powOut.append("path")
+        .attr("class", "line_powOut")
         .attr("clip-path", "url(#clip_desHead)")
         .style("fill", "none")
         .style("stroke", "#900")
         .style("stroke-width", "2");
 
-    svg_windDir.append("text")
+    svg_powOut.append("text")
         .attr("x", (width / 2))             
         .attr("y", 20 - (margin.top / 2))
         .attr("text-anchor", "middle")  
         .style("font-size", "16px") 
         .style("text-decoration", "underline")  
-        .text("Wind Direction");
+        .text("Output Port Power");
 
 
-    svg_windDir.append("text")
+    svg_powOut.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 20 - margin.left)
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Wind Direction [deg]");
+        .text("Output Port Power [mW]");
 
 
-    svg_windDir.append("text")             // text label for the x axis
+    svg_powOut.append("text")             // text label for the x axis
                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-40) + ")")
         .style("text-anchor", "middle")
         .text("UTC")
@@ -432,39 +432,39 @@
 
 
     // ============
-    // Temperature(degC)
+    // Battery Charging Power (mW)
     //
-    var var_temp = "Temperature(degC)";
+    var var_powBattCharge = "Battery Charging Power (mW)";
 
     // Setup scales for stations graph
-    var y_temp = d3.scale.linear()
+    var y_powBattCharge = d3.scale.linear()
             .range([h_sta, 0]),
-        xAxis_temp = d3.svg.axis()
+        xAxis_powBattCharge = d3.svg.axis()
             .scale(x)
             .orient("bottom")
             .tickSize(-h_sta, 0)
             .tickPadding(6);
             // .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
-        yAxis_temp = d3.svg.axis()
-            .scale(y_temp)
+        yAxis_powBattCharge = d3.svg.axis()
+            .scale(y_powBattCharge)
             .orient("left")
             .tickSize(-width)
             .tickPadding(6);
 
 
-    var line_temp = d3.svg.line()
+    var line_powBattCharge = d3.svg.line()
         .interpolate("step-after")
         .x(function(d) { return x(d3.time.hour.offset(d[var_time],UTC_to_LR_time_offset)); })
-        .y(function(d) { return y_temp(d[var_temp]); });
+        .y(function(d) { return y_powBattCharge(d[var_powBattCharge]); });
 
 
-    var svg_temp = d3.select("#area7").append("svg")
+    var svg_powBattCharge = d3.select("#area7").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svg_temp.append("clipPath")
+    svg_powBattCharge.append("clipPath")
         .attr("id", "clip_sta")
       .append("rect")
         .attr("x", x(0))
@@ -472,40 +472,40 @@
         .attr("width", x(1) - x(0))
         .attr("height", y(0) - y(1));
 
-    svg_temp.append("g")
+    svg_powBattCharge.append("g")
         .attr("class", "y axis")
         // .attr("transform", "translate(" + width + ",0)");
 
-    svg_temp.append("g")
+    svg_powBattCharge.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + h_sta + ")");
 
-    svg_temp.append("path")
-        .attr("class", "line_temp")
+    svg_powBattCharge.append("path")
+        .attr("class", "line_powBattCharge")
         .attr("clip-path", "url(#clip_sta)")
         .style("fill", "none")
         .style("stroke", "#900")
         .style("stroke-width", "2");
 
-    svg_temp.append("text")
+    svg_powBattCharge.append("text")
         .attr("x", (width / 2))             
         .attr("y", 20 - (margin.top / 2))
         .attr("text-anchor", "middle")  
         .style("font-size", "16px") 
         .style("text-decoration", "underline")  
-        .text("Temperature");
+        .text("Battery Charging Power");
 
 
-    svg_temp.append("text")
+    svg_powBattCharge.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 20 - margin.left)
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Temperature [deg C]");
+        .text("Battery Charging Power [mW]");
 
 
-    svg_temp.append("text")             // text label for the x axis
+    svg_powBattCharge.append("text")             // text label for the x axis
                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-40) + ")")
         .style("text-anchor", "middle")
         .text("UTC")
@@ -515,40 +515,40 @@
 
 
 
-// ============
-// Pressure(mb)
-//
-    var var_pressure = "Pressure(mb)";
+    // ============
+    // Battery Charging Current (mA)
+    //
+    var var_currBattCharge = "Battery Charging Current (mA)";
 
     // Setup scales for stations graph
-    var y_pressure = d3.scale.linear()
+    var y_currBattCharge = d3.scale.linear()
             .range([h_sta, 0]),
-        xAxis_pressure = d3.svg.axis()
+        xAxis_currBattCharge = d3.svg.axis()
             .scale(x)
             .orient("bottom")
             .tickSize(-h_sta, 0)
             .tickPadding(6);
             // .tickFormat(d3.time.format("%Y-%m-%d %H:%M")), // insert the tickFormat function;
-        yAxis_pressure = d3.svg.axis()
-            .scale(y_pressure)
+        yAxis_currBattCharge = d3.svg.axis()
+            .scale(y_currBattCharge)
             .orient("left")
             .tickSize(-width)
             .tickPadding(6);
 
 
-    var line_pressure = d3.svg.line()
+    var line_currBattCharge = d3.svg.line()
         .interpolate("step-after")
         .x(function(d) { return x(d3.time.hour.offset(d[var_time],UTC_to_LR_time_offset)); })
-        .y(function(d) { return y_pressure(d[var_pressure]); });
+        .y(function(d) { return y_currBattCharge(d[var_currBattCharge]); });
 
 
-    var svg_pressure = d3.select("#area8").append("svg")
+    var svg_currBattCharge = d3.select("#area8").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svg_pressure.append("clipPath")
+    svg_currBattCharge.append("clipPath")
         .attr("id", "clip_sta")
       .append("rect")
         .attr("x", x(0))
@@ -556,46 +556,43 @@
         .attr("width", x(1) - x(0))
         .attr("height", y(0) - y(1));
 
-    svg_pressure.append("g")
+    svg_currBattCharge.append("g")
         .attr("class", "y axis")
         // .attr("transform", "translate(" + width + ",0)");
 
-    svg_pressure.append("g")
+    svg_currBattCharge.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + h_sta + ")");
 
-    svg_pressure.append("path")
-        .attr("class", "line_pressure")
+    svg_currBattCharge.append("path")
+        .attr("class", "line_currBattCharge")
         .attr("clip-path", "url(#clip_sta)")
         .style("fill", "none")
         .style("stroke", "#900")
         .style("stroke-width", "2");
 
-    svg_pressure.append("text")
+    svg_currBattCharge.append("text")
         .attr("x", (width / 2))             
         .attr("y", 20 - (margin.top / 2))
         .attr("text-anchor", "middle")  
         .style("font-size", "16px") 
         .style("text-decoration", "underline")  
-        .text("Pressure");
+        .text("Battery Charging Current");
 
 
-    svg_pressure.append("text")
+    svg_currBattCharge.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 20 - margin.left)
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Pressure [mBar]");
+        .text("Battery Charging Current [mA]");
 
 
-    svg_pressure.append("text")             // text label for the x axis
+    svg_currBattCharge.append("text")             // text label for the x axis
                .attr("transform","translate(" + (width/2) + " ," +(height+margin.bottom-40) + ")")
         .style("text-anchor", "middle")
         .text("UTC")
-
-
-
 
 
 
@@ -603,18 +600,17 @@
     // CREATE PLOTS
     //
 
-    d3.csv("WeatherData_wgms_30d.csv", function(error, data) {
+    d3.csv("PowerData_wgms_30d.csv", function(error, data) {
       if (error) throw error;
     
         data.forEach(function(d) {
             d.TimeStamp = parse(d.TimeStamp);
-            d[var_wind]         = +d[var_wind];
-            d[var_windGust]     = +d[var_windGust];
-            d[var_windDir]      = +d[var_windDir];
-            d[var_temp]         = +d[var_temp];
-            d[var_pressure]     = +d[var_pressure];
+            d[var_totBattPower]     = +d[var_totBattPower];
+            d[var_powSolar]         = +d[var_powSolar];
+            d[var_powOut]           = +d[var_powOut];
+            d[var_powBattCharge]    = +d[var_powBattCharge];
+            d[var_currBattCharge]   = +d[var_currBattCharge];
         });
-
 
         // Compute the minimum and maximum value for both graphs
         x.domain([
@@ -623,39 +619,38 @@
         ]);
         
         y.domain([
-            d3.min(data, function(d) { return d[var_wind]; }), 
-            d3.max(data, function(d) { return d[var_wind]; })
+            d3.min(data, function(d) { return d[var_totBattPower]; }), 
+            d3.max(data, function(d) { return d[var_totBattPower]; })
         ]);
 
-        y_windGust.domain([
-            d3.min(data, function(d) { return d[var_windGust]; }), 
-            d3.max(data, function(d) { return d[var_windGust]; })
+        y_powSolar.domain([
+            d3.min(data, function(d) { return d[var_powSolar]; }), 
+            d3.max(data, function(d) { return d[var_powSolar]; })
         ]);
 
-        y_windDir.domain([
-            d3.min(data, function(d) { return d[var_windDir]; }), 
-            d3.max(data, function(d) { return d[var_windDir]; })
+        y_powOut.domain([
+            d3.min(data, function(d) { return d[var_powOut]; }), 
+            d3.max(data, function(d) { return d[var_powOut]; })
         ]);
 
-        y_temp.domain([
-            d3.min(data, function(d) { return d[var_temp]; }), 
-            d3.max(data, function(d) { return d[var_temp]; })
+        y_powBattCharge.domain([
+            d3.min(data, function(d) { return d[var_powBattCharge]; }), 
+            d3.max(data, function(d) { return d[var_powBattCharge]; })
         ]);
 
-        y_pressure.domain([
-            d3.min(data, function(d) { return d[var_pressure]; }), 
-            d3.max(data, function(d) { return d[var_pressure]; })
+        y_currBattCharge.domain([
+            d3.min(data, function(d) { return d[var_currBattCharge]; }), 
+            d3.max(data, function(d) { return d[var_currBattCharge]; })
         ]);
 
         // Add zoom behavior
         rect.call(d3.behavior.zoom().x(x).on("zoom", zoom));
         
         svg.select("path.line").data([data]);
-        svg_windGust.select("path.line_windGust").data([data]);
-        svg_windDir.select("path.line_windDir").data([data]);
-        svg_temp.select("path.line_temp").data([data]);
-        svg_pressure.select("path.line_pressure").data([data]);
-
+        svg_powSolar.select("path.line_powSolar").data([data]);
+        svg_powOut.select("path.line_powOut").data([data]);
+        svg_powBattCharge.select("path.line_powBattCharge").data([data]);
+        svg_currBattCharge.select("path.line_currBattCharge").data([data]);
         draw();
     });
 
@@ -665,26 +660,28 @@
       // Draw axes
       svg.select("g.x.axis").call(xAxis);
       svg.select("g.y.axis").call(yAxis);
-      svg_windGust.select("g.x.axis").call(xAxis_windGust);
-      svg_windGust.select("g.y.axis").call(yAxis_windGust);
-      svg_windDir.select("g.x.axis").call(xAxis_windDir);
-      svg_windDir.select("g.y.axis").call(yAxis_windDir);
-      svg_temp.select("g.x.axis").call(xAxis_temp);
-      svg_temp.select("g.y.axis").call(yAxis_temp);
-      svg_pressure.select("g.x.axis").call(xAxis_pressure);
-      svg_pressure.select("g.y.axis").call(yAxis_pressure);
+      svg_powSolar.select("g.x.axis").call(xAxis_powSolar);
+      svg_powSolar.select("g.y.axis").call(yAxis_powSolar);
+      svg_powOut.select("g.x.axis").call(xAxis_powOut);
+      svg_powOut.select("g.y.axis").call(yAxis_powOut);
+      svg_powBattCharge.select("g.x.axis").call(xAxis_powBattCharge);
+      svg_powBattCharge.select("g.y.axis").call(yAxis_powBattCharge);
+      svg_currBattCharge.select("g.x.axis").call(xAxis_currBattCharge);
+      svg_currBattCharge.select("g.y.axis").call(yAxis_currBattCharge);
 
 
       // Add data
       svg.select("path.line").attr("d", line);
-      svg_windGust.select("path.line_windGust").attr("d", line_windGust);
-      svg_windDir.select("path.line_windDir").attr("d", line_windDir);
-      svg_temp.select("path.line_temp").attr("d", line_temp);
-      svg_pressure.select("path.line_pressure").attr("d", line_pressure);
+      svg_powSolar.select("path.line_powSolar").attr("d", line_powSolar);
+      svg_powOut.select("path.line_powOut").attr("d", line_powOut);
+      svg_powBattCharge.select("path.line_powBattCharge").attr("d", line_powBattCharge);
+      svg_currBattCharge.select("path.line_currBattCharge").attr("d", line_currBattCharge);
     }
 
     function zoom() {
       draw();
     }
+
+
 
 </script>
