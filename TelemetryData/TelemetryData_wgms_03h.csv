@@ -1,4 +1,6 @@
 TimeStamp,Structure ID,Ground Speed(kt),Target,Desired Heading (deg),Sub Heading,POG (deg),Float Temp(degC),Pressure Sensor Float(kPa),Battery (Wh),Signal Strength,User Name,Lat (deg),Lon (deg),Distance Over Ground(m),Water Speed (kt/1000) WS,Water Direction,Current Speed (kt),Current Heading (deg),Created On,,
+24.11.2016 2:37 AM,Telemetry6,0.145788,42,176,80,142,25,115,604.84,5,System Admin,27.99238,-15.36825,9,0,79,,,24.11.2016 2:37 AM, ,
+24.11.2016 2:35 AM,Telemetry6,0.145788,42,175,81,108,25,115,604.82,1,System Admin,27.99241,-15.36828,9,0,79,,,24.11.2016 2:36 AM, ,
 24.11.2016 2:33 AM,Telemetry6,0.145788,42,175,80,146,25,115,604.8,0,System Admin,27.99241,-15.36829,9,0,79,,,24.11.2016 2:34 AM, ,
 24.11.2016 2:31 AM,Telemetry6,0.064795,42,175,80,278,25,115,604.71,4,System Admin,27.99242,-15.36830,4,0,79,,,24.11.2016 2:31 AM, ,
 24.11.2016 2:29 AM,Telemetry6,0.097192,42,175,80,87,25,115,604.61,5,System Admin,27.99242,-15.36827,6,0,79,,,24.11.2016 2:29 AM, ,
