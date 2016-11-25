@@ -135,7 +135,8 @@
 
 <!-- <script src="//d3js.org/d3.v3.min.js"></script> -->
 <script src="../D3/d3.v3.min.js"></script>
-<script src="../D3/d3-zoom-pan-extent.js"</script>
+<script src="../D3/d3-zoom-pan-extent.js"></script>
+
 <script>
     
     // Get time 
@@ -1091,7 +1092,7 @@
             .xExtent(x.domain())
             .on("zoom", zoom)
         );
-                
+        
         svg.select("path.line").data([data]);
         svg_target.select("path.line_target").data([data]);
         svg_desHead.select("path.line_desHead").data([data]);
