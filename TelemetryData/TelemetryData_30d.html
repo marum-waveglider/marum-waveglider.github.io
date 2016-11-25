@@ -1086,8 +1086,12 @@
         ]);
 
         // Add zoom behavior
-        rect.call(d3.behavior.zoom().x(x).on("zoom", zoom));
-        
+        rect.call(d3.behavior.zoom()
+            .x(x)
+            .xExtent(x.domain())
+            .on("zoom", zoom)
+        );
+                
         svg.select("path.line").data([data]);
         svg_target.select("path.line_target").data([data]);
         svg_desHead.select("path.line_desHead").data([data]);
